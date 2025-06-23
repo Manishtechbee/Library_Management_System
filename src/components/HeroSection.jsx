@@ -1,0 +1,71 @@
+import { motion } from "framer-motion";
+import monitorImg from "../assets/monitor.png";
+import booksImg from "../assets/book.png";
+
+export default function HeroSection() {
+  return (
+    <section className="bg-[#e8f1fb] py-10 pb-40 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col-reverse md:flex-row items-center justify-between gap-16">
+        
+        {/* LEFT CONTENT */}
+        <div className="md:w-1/2 space-y-6 text-center md:text-left z-10">
+          <motion.h1
+            className="text-[2.5rem] md:text-5xl font-bold text-[#1b365d] leading-tight"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
+            viewport={{ amount: 0.3 }}
+          >
+            Library<br />Management<br />System
+          </motion.h1>
+
+          <motion.p
+            className="text-gray-700 text-lg md:text-base"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.43, 0.13, 0.23, 0.96] }}
+            viewport={{ amount: 0.3 }}
+          >
+            Streamline library operations with ease.<br />Manage books, members, issuance, and returns efficiently.
+          </motion.p>
+
+          <motion.a
+            href="/dashboard"
+            className="inline-block bg-[#5F97CD] hover:bg-[#3a7ce1] text-white font-bold px-6 py-3 rounded-lg transition duration-200"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+            viewport={{ amount: 0.3 }}
+          >
+            Get Started
+          </motion.a>
+        </div>
+
+        {/* RIGHT IMAGES */}
+        <div className="md:w-1/2 relative z-10 flex justify-center">
+          <motion.img
+            src={monitorImg}
+            alt="Library Monitor"
+            className="w-[70%] max-w-md z-20"
+            initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            viewport={{ amount: 0.3 }}
+          />
+          <motion.img
+            src={booksImg}
+            alt="Book Stack"
+            className="absolute -bottom-20 -left-40 w-140 md:w-64 z-30"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+            viewport={{ amount: 0.3 }}
+          />
+        </div>
+      </div>
+
+      {/* Decorative Bottom Shape */}
+      <div className="absolute bottom-0 left-0 w-full h-36 bg-[#d1e3f4] z-0" />
+    </section>
+  );
+}
