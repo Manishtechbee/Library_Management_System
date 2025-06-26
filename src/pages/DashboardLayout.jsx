@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/general/Navbar";
 import { Outlet } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 

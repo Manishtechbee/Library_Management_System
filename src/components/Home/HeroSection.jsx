@@ -1,8 +1,27 @@
 import { motion } from "framer-motion";
-import monitorImg from "../assets/monitor.png";
-import booksImg from "../assets/book.png";
+import monitorImg from "../../assets/monitor.png";
+import booksImg from "../../assets/book.png";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
+
+const handleGetStarted = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  const role = user.role;
+  if (role === "admin") navigate("/dashboard/admin");
+  else if (role === "student") navigate("/dashboard/student");
+  else if (role === "faculty") navigate("/dashboard/faculty");
+  else if (role === "librarian") navigate("/dashboard/librarian");
+  else navigate("/");
+};
+
+
   return (
     <section className="bg-[#e8f1fb] py-10 pb-40 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 flex flex-col-reverse md:flex-row items-center justify-between gap-16">
@@ -29,8 +48,8 @@ export default function HeroSection() {
             Streamline library operations with ease.<br />Manage books, members, issuance, and returns efficiently.
           </motion.p>
 
-          <motion.a
-            href="/dashboard"
+          <motion.button
+  onClick={handleGetStarted}
             className="inline-block bg-[#5F97CD] hover:bg-[#3a7ce1] text-white font-bold px-6 py-3 rounded-lg transition duration-200"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -38,7 +57,7 @@ export default function HeroSection() {
             viewport={{ amount: 0.3 }}
           >
             Get Started
-          </motion.a>
+          </motion.button>
         </div>
 
         {/* RIGHT IMAGES */}

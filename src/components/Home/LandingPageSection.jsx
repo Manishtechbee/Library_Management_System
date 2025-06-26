@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion';
-import StatisticsSection from '../components/StatisticsSection'
-import TestimonialsSection from '../components/TestimonialsSection'
-import RoleShowcaseSection from '../components/RoleShowcaseSection'
-import FAQSection from '../components/FAQSection'
-import ChatbotSection from '../components/Chatbotsection'
-import Chatbot from '../components/Chatbot'
+import StatisticsSection from './StatisticsSection'
+import TestimonialsSection from './TestimonialsSection'
+import RoleShowcaseSection from './RoleShowcaseSection'
+import FAQSection from './FAQSection'
+import ChatbotSection from './Chatbotsection'
+import Chatbot from '../general/Chatbot'
 import { useState } from 'react';
-import FeaturesSection from '../components/FeaturesSection'
-import CTASection from '../components/CTASection'
+import FeaturesSection from './FeaturesSection'
+import CTASection from './CTASection'
 
-export default function LandingPageSection() {
+export default function LandingPageSection({chatOpen, setChatOpen}) {
   
-  const [chatOpen, setChatOpen] = useState(false);
+  
 
   const containerVariants = {
     hidden: { opacity: 0, y: 40 },

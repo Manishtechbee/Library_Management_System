@@ -1,20 +1,16 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import HeroSection from '../components/HeroSection'
-import LandingPageSection from '../components/LandingPageSection'
-import Footer from '../components/Footer'
+import React from 'react';
+import Navbar from '../components/general/Navbar';
+import HeroSection from '../components/Home/HeroSection';
+import LandingPageSection from '../components/Home/LandingPageSection';
+import Footer from '../components/general/Footer';
 
-
-export default function Home() {
+export default function Home({chatOpen ,setChatOpen}) {
   return (
-    <>
-    <div className="bg-white text-gray-800 min-h-screen">
-        <Navbar/>
-        <HeroSection/>
-        <LandingPageSection/>
-        <Footer/>
+    <div className="min-h-screen bg-white text-gray-800 ">
+      <Navbar />
+      <HeroSection />
+      <LandingPageSection chatOpen={chatOpen} setChatOpen={setChatOpen} />
+      <Footer />
     </div>
-    
-    </>
-  )
+  );
 }

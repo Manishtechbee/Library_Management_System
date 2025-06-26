@@ -1,41 +1,31 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from '../api/auth'
-
-
-
-
+import { login } from '../api/auth'  // Your real API function
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+
   const handleSubmit = async (e) => {
-  e.preventDefault()
+  e.preventDefault();
   try {
-    const res = await login(email, password)
-    console.log('Login successful', res.data)
+    const res = await login(email, password);
+    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
 
-    // Store token (you can also use Context API here)
-    localStorage.setItem('token', res.data.token)
-
-    // Redirect to dashboard
-    navigate('/dashboard')
+    // Redirect based on role
+    const role = res.data.user.role;
+    if (role === "admin") navigate('/dashboard/admin');
+    else if (role === "student") navigate('/dashboard/student');
+    else if (role === "faculty") navigate('/dashboard/faculty');
+    else if (role === "librarian") navigate('/dashboard/librarian');
+    else navigate('/'); // Fallback
   } catch (err) {
-    console.error(err.response?.data?.message || 'Login failed')
-    setError(err.response?.data?.message || 'Invalid email or password')
+    setError(err.response?.data?.message || 'Invalid email or password');
   }
-}
-  const handleLogin = (e) => {
-    e.preventDefault()
-    // Dummy check – replace with real auth
-    if (email === 'admin@library.com' && password === 'admin123') {
-      navigate('/dashboard')
-    } else {
-      setError('Invalid email or password')
-    }
-  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f1f6fb]">
@@ -69,7 +59,6 @@ export default function Login() {
             />
           </div>
 
-          
           <button
             type="submit"
             className="w-full bg-[#3a7ce1] text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition"
@@ -81,7 +70,6 @@ export default function Login() {
               Forgot password?
             </Link>
           </div>
-
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-6">

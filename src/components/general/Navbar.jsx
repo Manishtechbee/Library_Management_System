@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import logo from '../assets/book-icon.png'
+import logo from '../../assets/book-icon.png'
 import { motion } from 'framer-motion'
 import { FaMoon } from 'react-icons/fa'
 

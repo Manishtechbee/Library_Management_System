@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import Chatbot from "../../components/general/Chatbot"
+
 export default function DashboardHome() {
   const cardVariants = {
     hidden: { opacity: 0, y: 15 },
@@ -55,7 +55,6 @@ export default function DashboardHome() {
           <li>⚠️ Priya’s book is overdue by <strong>3 days</strong></li>
         </ul>
       </motion.div>
-      <Chatbot/>
     </div>
   );
 }
