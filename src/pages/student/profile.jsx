@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Profile() {
+  const navigate=useNavigate();
+  
+  const u = JSON.parse(localStorage.getItem("user"));
+  const role = u?.role;
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -11,27 +16,18 @@ export default function Profile() {
     year: ""
   });
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user")) || {
-      name: "Manish Kumar",
-      email: "manish@example.com",
-      phone: "9876543210",
-      address: "Hoshiarpur, Punjab",
-      studentId: "STU123456",
-      department: "Computer Science",
-      year: "2nd Year"
-    };
-    setUser(storedUser);
-  }, []);
+useEffect(() => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  console.log(storedUser);
+  if (storedUser?.id) {
+    fetch(`http://localhost:5000/api/student/${storedUser.id}`)
+      .then(res => res.json())
+      .then(data => setUser(data))
+      .catch(err => console.error(err));
+  }
+}, []);
 
-  const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
-
-  const handleSave = () => {
-    localStorage.setItem("user", JSON.stringify(user));
-    alert("Profile updated successfully!");
-  };
+ 
 
   return (
     <div className="max-w-2xl py-4 px-15">
@@ -39,7 +35,7 @@ export default function Profile() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <img
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3a7ce1&color=fff`}
+          src={user.profileImage?`http://localhost:5000${user.profileImage}`:`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3a7ce1&color=fff`}
           alt="Profile"
           className="w-16 h-16 rounded-full object-cover"
         />
@@ -59,7 +55,7 @@ export default function Profile() {
             <input
               name="name"
               value={user.name}
-              onChange={handleChange}
+              disabled
               className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
               type="text"
             />
@@ -69,7 +65,7 @@ export default function Profile() {
             <input
               name="phone"
               value={user.phone}
-              onChange={handleChange}
+              disabled
               className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
               type="text"
             />
@@ -79,7 +75,7 @@ export default function Profile() {
             <input
               name="address"
               value={user.address}
-              onChange={handleChange}
+              disabled
               className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
               type="text"
             />
@@ -125,10 +121,10 @@ export default function Profile() {
       {/* Save Button */}
       <div className="flex justify-end">
         <button
-          onClick={handleSave}
+        onClick={() => navigate(`/dashboard/${role}/settings`)}
           className="px-5 py-2 bg-[#3a7ce1] text-white rounded text-sm hover:bg-[#285dad] transition"
         >
-          Save Changes
+          Edit Details
         </button>
       </div>
     </div>

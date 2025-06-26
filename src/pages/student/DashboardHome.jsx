@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { FaBell } from "react-icons/fa";
+
 import {
   FaBook,
   FaClock,
@@ -10,6 +12,7 @@ import {
   FaPlus,
   FaFilePdf,
 } from "react-icons/fa";
+import NotificationBell from "../../components/general/NotificationBell";
 
 export default function DashboardHome() {
   const [profileCompletion] = useState(80);
@@ -21,17 +24,24 @@ export default function DashboardHome() {
   return (
     <div className="space-y-8">
       
-      {/* Welcome Message */}
-      <motion.div
-        initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-3xl md:text-4xl font-bold text-[#1b365d] mb-2">
-          Welcome, {studentName}!
-        </h2>
-        <p className="text-gray-600 text-lg">Here's your overview for today.</p>
-      </motion.div>
+     {/* Welcome Message with Notification */}
+<motion.div
+  initial={{ opacity: 0, y: -15 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+  className="flex justify-between items-start mb-4"
+>
+  <div>
+    <h2 className="text-3xl md:text-4xl font-bold text-[#1b365d] mb-2">
+      Welcome, {studentName}!
+    </h2>
+    <p className="text-gray-600 text-lg">Here's your overview for today.</p>
+  </div>
+
+ <NotificationBell/>
+
+</motion.div>
+
 
       {/* Summary Cards */}
       <motion.div
