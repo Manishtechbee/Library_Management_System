@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Home from './pages/Home';
 import DashboardLayout from './pages/DashboardLayout';
@@ -31,16 +33,17 @@ import Supp from './pages/faculty/suppport';
 import Sett from './pages/faculty/settings';
 
 import Eresources from './pages/student/Eresources';
-import Reservations from './pages/student/reservations';
 import Profile from './pages/student/profile';
 import Support from './pages/student/suppport';
 import Settings from './pages/student/settings';
 import Fines from './pages/student/fines';
+import ResetPassword from './components/resetpassword';
 
 
 export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
   return (
+    <>
     <Routes>
       <Route path="/" element={<Home chatOpen={chatOpen} setChatOpen={setChatOpen} />} />
 
@@ -71,13 +74,15 @@ export default function App() {
   
       <Route path="catalog" element={<BooksCatalog />} />
   <Route path="e-resources" element={<Eresources/>} />
-  <Route path="reservations" element={<Reservations />} />
   <Route path="fines" element={<Fines/>} />
   <Route path="profile" element={<Profile />} />
   <Route path="settings" element={<Settings />} />
   <Route path="support" element={<Support />} />
 
 </Route>
+
+
+<Route path="/reset-password/:token" element={<ResetPassword />} />
 
 
       {/* Faculty Dashboard */}
@@ -147,6 +152,8 @@ export default function App() {
       {/*Error Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+    <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+    </>
   );
 }
 

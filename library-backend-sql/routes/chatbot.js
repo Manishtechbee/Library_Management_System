@@ -1,4 +1,4 @@
-const express = require('express');
+{/*const express = require('express');
 const router = express.Router();
 
 const unrecognizedCount = {}; // Track failed attempts per user (for demo, using IP as identifier)
@@ -88,3 +88,4 @@ router.post('/chat', (req, res) => {
 });
 
 module.exports = router;
+*/}

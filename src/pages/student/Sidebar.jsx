@@ -112,7 +112,7 @@ export default function Sidebar() {
             E-Resources
           </NavLink>
 
-          <NavLink
+          {/*<NavLink
             to={`/dashboard/${role}/reservations`}
             className={({ isActive }) =>
               `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] ${
@@ -122,7 +122,7 @@ export default function Sidebar() {
           >
             <FaBookmark />
             Reservations
-          </NavLink>
+          </NavLink>*/}
 
           <NavLink
             to={`/dashboard/${role}/fines`}

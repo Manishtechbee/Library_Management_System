@@ -1,6 +1,23 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 export default function CTASection() {
+   const navigate = useNavigate();
+
+const handleGetStarted = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  const role = user.role;
+  if (role === "admin") navigate("/dashboard/admin");
+  else if (role === "student") navigate("/dashboard/student");
+  else if (role === "faculty") navigate("/dashboard/faculty");
+  else if (role === "librarian") navigate("/dashboard/librarian");
+  else navigate("/");
+};
 
   const containerVariants = {
     hidden: { opacity: 0, y: 40 },
@@ -35,7 +52,7 @@ export default function CTASection() {
         </p>
 
         <motion.a
-          href="/dashboard"
+          onClick={handleGetStarted}
           className="inline-block bg-white text-[#1b365d] font-semibold px-6 py-3 rounded-lg hover:bg-gray-200 transition"
           variants={buttonVariants}
           whileHover={{ scale: 1.05 }}

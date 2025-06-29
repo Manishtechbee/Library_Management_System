@@ -1,4 +1,4 @@
-const express = require('express');
+{/*const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
@@ -66,3 +66,4 @@ router.post('/login', (req, res) => {
 });
 
 module.exports = router;
+*/}

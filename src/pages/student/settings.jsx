@@ -25,20 +25,31 @@ export default function StudentSettings() {
 
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  useEffect(() => {
-    if (storedUser?.id) {
-      fetch(`http://localhost:5000/api/student/${storedUser.id}`)
-        .then(res => res.json())
-        .then(data => {
-          setName(data.name);
-          setEmail(data.email);
-          setPhone(data.phone);
-          setAddress(data.address);
-          setAvatar(`http://localhost:5000${data.profileImage}`);
-        })
-        .catch(err => console.error(err));
-    }
-  }, []);
+ useEffect(() => {
+  if (storedUser?.id) {
+    fetch(`http://localhost:5000/api/student/${storedUser.id}`)
+      .then(res => res.json())
+      .then(data => {
+        setName(data.name);
+        setEmail(data.email);
+        setPhone(data.phone);
+        setAddress(data.address);
+        const fallbackName = data.name || "Student";
+        
+        const ProfileImage = data.profileImage==null?
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=cccccc&color=000&size=128`:
+        `http://localhost:5000${data.profileImage}`;
+        console.log(ProfileImage);
+        
+        
+          setAvatar(ProfileImage);
+        
+      })
+      .catch(err => console.error(err));
+  }
+}, []);
+
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -48,7 +59,6 @@ export default function StudentSettings() {
 
       const formData = new FormData();
       formData.append("profileImage", file);
-
       fetch(`http://localhost:5000/api/student/upload-profile/${storedUser.id}`, {
         method: "POST",
         body: formData

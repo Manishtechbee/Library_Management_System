@@ -2,8 +2,12 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaSearch, FaBook } from "react-icons/fa";
 import axios from "axios";
+import { toast } from 'react-toastify';
+
 
 export default function BooksCatalog() {
+  
+  const user = JSON.parse(localStorage.getItem("user"));
   const [books, setBooks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
@@ -14,29 +18,63 @@ export default function BooksCatalog() {
   useEffect(() => {
   setLoading(true);
 
-  // Fetch dummy books first (existing logic)
-  axios.get("https://dummyjson.com/products?limit=30")
-    .then(res => {
-      const dummyBooks = res.data.products.map(p => ({
-        id: p.id,
-        title: p.title,
-        author: "Author Name",
-        category: "Programming",
-        available: Math.random() > 0.3,
-        image: p.thumbnail,  // Use dummy image
-        edition: "1st",
-        publisher: "Dummy Publisher",
-        year: "2023",
-        branch: "CSE",
-        department: "Engineering",
-        copies: Math.floor(Math.random() * 10) + 1
-      }));
-      setBooks(dummyBooks);
-    })
-    .catch(err => console.error(err))
-    .finally(() => setLoading(false));
 
-  // Fetch real books from Google Books API
+
+  
+
+axios.get("http://localhost:5000/api/books")
+  .then(async (res) => {
+    const booksWithImages = await Promise.all(res.data.map(async (book) => {
+      try {
+        const googleRes = await axios.get(
+          `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}&maxResults=1`
+        );
+
+        const googleBook = googleRes.data.items?.[0]?.volumeInfo || {};
+        const accessInfo = googleRes.data.items?.[0]?.accessInfo || {};
+
+        const image = googleBook.imageLinks?.thumbnail || `https://picsum.photos/200/300?random=${book.id}`;
+        const ebookLink = accessInfo.webReaderLink || book.ebook_link || "";
+
+        return {
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          category: book.category || "General",
+          available: book.available_copies > 0,
+          image: image,
+          ebook_link: ebookLink,
+          edition: book.edition || "N/A",
+          publisher: book.publisher || "Unknown",
+          year: book.publication_year || "Unknown",
+          branch: "All",
+          department: "General",
+          copies: book.total_copies || 0
+        };
+      } catch (err) {
+        console.error("Error fetching image or ebook for", book.title, err);
+        toast.error(`Error fetching details for "${book.title}"`);
+        return {
+          ...book,
+          image: `https://picsum.photos/200/300?random=${book.id}`,
+          ebook_link: book.ebook_link || ""
+        };
+      }
+    }));
+
+    setBooks(booksWithImages);
+  })
+  .catch(err => {
+    console.error(err);
+    toast.error("Failed to fetch books from backend");
+  })
+  .finally(() => setLoading(false));
+
+
+}, []);
+
+
+ {/* // Fetch real books from Google Books API
   axios.get(`https://www.googleapis.com/books/v1/volumes?q=programming&maxResults=20`)
     .then(res => {
       const apiBooks = res.data.items.map((item, index) => ({
@@ -55,9 +93,9 @@ export default function BooksCatalog() {
       }));
       setBooks(prev => [...apiBooks, ...prev]);  // Combine real + dummy data
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error(err));*/}
 
-}, []);
+
 
 
   const filteredBooks = books.filter(book => {
@@ -70,9 +108,20 @@ export default function BooksCatalog() {
   });
 
   const handleIssue = (book) => {
-    alert(`Issue request for: ${book.title}`);
-    // Here, you'd make a POST request to your backend to request issuing the book
-  };
+  axios.post("http://localhost:5000/api/request-issue", {
+    book_id: book.id,
+    user_id: user.id
+  })
+  .then(res => {
+    toast.success(res.data.message || "Issue request submitted successfully!");
+  })
+  .catch(err => {
+    console.error(err);
+    toast.error("Failed to request issue. Please try again.");
+  });
+};
+
+
 
   return (
     <div className="w-full p-6 space-y-6">
@@ -108,10 +157,22 @@ export default function BooksCatalog() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white shadow-md p-4 rounded-lg animate-pulse h-32" />
-          ))
-        ) : (
+  Array.from({ length: 6 }).map((_, i) => (
+    <div
+      key={i}
+      className="bg-white shadow-md p-4 rounded-lg flex flex-col gap-3 animate-pulse"
+    >
+      <div className="w-80 mt-3 mx-auto justify-center h-50 bg-gray-200 rounded" />
+      <div className="h-4 bg-gray-200 rounded w-3/4" />
+      <div className="h-3 bg-gray-200 rounded w-1/2" />
+      <div className="h-3 bg-gray-200 rounded w-1/4" />
+      <div className="flex gap-2 mt-4">
+        <div className="h-8 bg-gray-200 rounded w-1/2" />
+        <div className="h-8 bg-gray-200 rounded w-1/2" />
+      </div>
+    </div>
+  ))
+) :  (
           filteredBooks.slice(0, visibleCount).map(book => (
             <motion.div key={book.id} className="bg-white shadow-md p-4 rounded-lg flex flex-col gap-2 hover:shadow-lg transition" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
   
@@ -135,11 +196,46 @@ export default function BooksCatalog() {
     {book.available ? "Available" : "Not Available"}
   </p>
 
-  {book.available && (
-    <button onClick={() => handleIssue(book)} className="mt-2 bg-[#5F97CD] hover:bg-[#3a7ce1] text-white px-3 py-1 rounded text-sm">
-      Request Issue
-    </button>
-  )}
+  <div className="mt-auto flex gap-2">
+
+  <button
+    onClick={() => {
+      if (book.available) {
+        handleIssue(book);
+      } else {
+        toast.error(`"${book.title}" is currently not available`);
+      }
+    }}
+    className={`flex-1 px-3 py-1 rounded-md text-sm transition shadow-sm ${
+      book.available
+        ? 'bg-[#5F97CD] hover:bg-[#3a7ce1] text-white'
+        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+    }`}
+  >
+    Request Issue
+  </button>
+
+  <button
+    onClick={() => {
+      if (book.ebook_link) {
+        window.open(book.ebook_link, '_blank', 'noopener noreferrer');
+      } else {
+        toast.error(`No E-Book available for "${book.title}"`);
+      }
+    }}
+    className={`flex-1 px-3 py-1 rounded-md text-sm transition shadow-sm ${
+      book.ebook_link
+        ? 'bg-[#A8C7F0] hover:bg-[#8BB6E8] text-[#1b365d]'
+        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+    }`}
+  >
+    View E-Book
+  </button>
+
+</div>
+
+
+
 </motion.div>
 
           ))
