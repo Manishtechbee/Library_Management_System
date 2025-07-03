@@ -50,8 +50,7 @@ exports.getIssuedBooks = (req, res) => {
       bb.returned_date,
       bb.copy_id
     FROM borrowed_books bb
-    JOIN book_copies bc ON bb.copy_id = bc.id
-    JOIN books b ON bc.book_id = b.id
+    JOIN books b ON bb.book_id = b.id
     WHERE bb.user_id = ?
     ORDER BY bb.borrowed_date DESC
   `;

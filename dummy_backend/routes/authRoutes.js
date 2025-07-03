@@ -14,6 +14,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'yoursecretkey';
 
 // Register Route
+// Register Route with student_id from students table
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -21,21 +22,41 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ message: 'All fields are required' });
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const sql = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
-
-    db.query(sql, [name, email, hashedPassword], (err, result) => {
+    // 1. Find student_id from students table by matching name and email
+    const findStudentQuery = 'SELECT student_id FROM students WHERE name = ? AND email = ?';
+    db.query(findStudentQuery, [name, email], async (err, results) => {
       if (err) {
-        if (err.code === 'ER_DUP_ENTRY')
-          return res.status(409).json({ message: 'Email already exists' });
+        console.error(err);
         return res.status(500).json({ message: 'Server error' });
       }
-      return res.status(201).json({ message: 'User registered successfully' });
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Student record not found. Please contact admin.' });
+      }
+
+      const studentId = results[0].student_id;
+
+      // 2. Hash password and insert into users table
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const insertQuery = 'INSERT INTO users (student_id, name, email, password, role) VALUES (?, ?, ?, ?, ?)';
+
+      db.query(insertQuery, [studentId, name, email, hashedPassword, 'student'], (err, result) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY')
+            return res.status(409).json({ message: 'Email already registered' });
+          console.error(err);
+          return res.status(500).json({ message: 'Server error' });
+        }
+
+        return res.status(201).json({ message: 'User registered successfully' });
+      });
     });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: 'Something went wrong' });
   }
 });
+
 
 // Login Route
 router.post('/login', (req, res) => {
@@ -47,16 +68,18 @@ router.post('/login', (req, res) => {
   const sql = 'SELECT * FROM users WHERE email = ?';
 
   db.query(sql, [email], async (err, results) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
+    if (err) {
+      
+      return res.status(500).json({ message: 'Server error' });}
 
-    if (results.length === 0)
-      return res.status(401).json({ message: 'Invalid email or password' });
+    if (results.length === 0){
+      return res.status(401).json({ message: 'Invalid email or password' });}
 
     const user = results[0];
     const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch)
-      return res.status(401).json({ message: 'Invalid email or password' });
+    if (!isMatch){
+      return res.status(401).json({ message: 'Invalid email or password' });}
 
     const token = jwt.sign(
       { id: user.id, role: user.role, name: user.name },

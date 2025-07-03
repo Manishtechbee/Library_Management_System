@@ -1,5 +1,23 @@
 const db = require('../config/db');
 
+exports.sendNotification = (user_id, message, io) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO notifications (user_id, message) VALUES (?, ?)';
+        db.query(sql, [user_id, message], (err, result) => {
+            if (err) return reject(err);
+
+            io.to(`user_${user_id}`).emit('new_notification', {
+                id: result.insertId,
+                user_id,
+                message,
+                is_read: false,
+                created_at: new Date()
+            });
+
+            resolve(result.insertId);
+        });
+    });
+};
 exports.createNotification = (req, res) => {
     const { user_id, message } = req.body;
     const io = req.app.get('io');

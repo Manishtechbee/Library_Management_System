@@ -1,39 +1,119 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaRupeeSign, FaClock, FaSearch, FaFilePdf } from "react-icons/fa";
+import { FaRupeeSign, FaClock, FaSearch, FaFilePdf, FaCheckCircle } from "react-icons/fa";
+import { toast } from "react-toastify";
+import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function Fines() {
   const [activeTab, setActiveTab] = useState("unpaid");
   const [search, setSearch] = useState("");
+  const [unpaidFines, setUnpaidFines] = useState([]);
+  const [paidFines, setPaidFines] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const unpaidFines = [
-    { title: "Database Systems", dueDate: "12 June 24", amount: 50, status: "Unpaid" },
-    { title: "Operating Systems", dueDate: "15 June 24", amount: 100, status: "Unpaid" },
-  ];
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  const paidFines = [
-    { title: "Database Systems", paidOn: "15 June 24", amount: 50, txnId: "TXN24587" },
-    { title: "Operating Systems", paidOn: "20 June 24", amount: 100, txnId: "TXN24589" },
-  ];
+  useEffect(() => {
+    fetchFines();
+  }, []);
 
-  const totalUnpaid = unpaidFines.reduce((acc, fine) => acc + fine.amount, 0);
-  const totalPaid = paidFines.reduce((acc, fine) => acc + fine.amount, 0);
+  const fetchFines = () => {
+    setLoading(true);
+    axios
+  .get(`http://localhost:5000/api/student/fines/${user.id}`)
+  .then((res) => {
+    const unpaid = res.data.filter(f => f.paid === 0);
+    const paid = res.data.filter(f => f.paid === 1);
 
-  const filteredUnpaid = unpaidFines.filter(fine =>
-    fine.title.toLowerCase().includes(search.toLowerCase())
-  );
+    // Map to align with your frontend expectations
+    setUnpaidFines(unpaid.map(f => ({
+      id: f.id,
+      title: f.reason,
+      due_date: f.issued_date, 
+      amount: f.fine_amount,
+    })));
 
-  const filteredPaid = paidFines.filter(fine =>
-    fine.title.toLowerCase().includes(search.toLowerCase())
-  );
+    setPaidFines(paid.map(f => ({
+      id: f.id,
+      title: f.reason,
+      paid_on: f.issued_date, 
+      amount: f.fine_amount,
+      txn_id: `TXN${f.id}` // Placeholder Transaction ID for frontend display
+    })));
+  })
+  .catch(() => toast.error("Failed to load fines"))
+  .finally(() => setLoading(false));
 
-  const exportPDF = () => {
-    alert("PDF Export triggered. Integrate with jsPDF if needed.");
   };
+const totalUnpaid = unpaidFines.reduce((acc, fine) => acc + Number(fine.amount), 0);
+const totalPaid = paidFines.reduce((acc, fine) => acc + Number(fine.amount), 0);
+
+
+  const filteredUnpaid = unpaidFines.filter((fine) =>
+    fine.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const filteredPaid = paidFines.filter((fine) =>
+    fine.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+ const handlePay = (fine) => {
+  axios
+    .post("http://localhost:5000/api/student/fines/pay", {
+      fine_id: fine.id,
+      user_id: user.id,
+    })
+    .then((res) => {
+      toast.success(res.data.message || "Fine paid successfully");
+      fetchFines();
+    })
+    .catch(() => toast.error("Failed to process payment"));
+};
+
+
+const handlePayAll = () => {
+  axios
+    .post("http://localhost:5000/api/student/fines/pay-all", {
+      user_id: user.id,
+    })
+    .then((res) => {
+      toast.success(res.data.message || "All fines paid successfully");
+      fetchFines();
+    })
+    .catch(() => toast.error("Failed to process payment"));
+};
+
+const exportPDF = () => {
+  const doc = new jsPDF();
+  doc.text("Payment History", 14, 20);
+
+  const tableColumn = ["Book Title", "Paid On", "Amount", "Transaction ID"];
+  const tableRows = paidFines.map((fine) => [
+    fine.title,
+    fine.paid_on,
+    `₹${fine.amount}`,
+    fine.txn_id,
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 30,
+  });
+
+  doc.save("payment_history.pdf");
+};
+
 
   return (
-    <div className="space-y-8">
-      
+    <div className="space-y-8 p-6">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-bold text-[#1b365d] mb-2">
+      Fines
+    </h2>
+      </div>
       {/* Summary Cards */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -65,30 +145,8 @@ export default function Fines() {
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-4">
-        <button
-          onClick={() => setActiveTab("unpaid")}
-          className={`px-4 py-2 rounded-full ${
-            activeTab === "unpaid"
-              ? "bg-blue-500 text-white shadow"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-          } transition`}
-        >
-          Unpaid Fines
-        </button>
-        <button
-          onClick={() => setActiveTab("history")}
-          className={`px-4 py-2 rounded-full ${
-            activeTab === "history"
-              ? "bg-blue-500 text-white shadow"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-          } transition`}
-        >
-          Payment History
-        </button>
-      </div>
-
-      {/* Search & Export */}
+      <div className="flex gap-4 flex-wrap">
+        {/* Search & Export */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="relative w-full sm:w-72">
           <FaSearch className="absolute top-3 left-3 text-gray-400" />
@@ -97,11 +155,40 @@ export default function Fines() {
             placeholder="Search by book title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm"
           />
         </div>
 
-        {activeTab === "history" && (
+        
+      </div>
+
+
+
+
+
+
+        <button
+          onClick={() => setActiveTab("unpaid")}
+          className={`px-4 py-2 rounded-xl ${
+            activeTab === "unpaid"
+              ? "bg-blue-500 text-white shadow "
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          } transition`}
+        >
+          Unpaid Fines
+        </button>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`px-4 py-2 rounded-xl ${
+            activeTab === "history"
+              ? "bg-blue-500 text-white shadow"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          } transition`}
+        >
+          Payment History
+        </button>
+        <div className="ml-auto mr-3">
+          {activeTab === "history" && (
           <button
             onClick={exportPDF}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full shadow hover:bg-green-700 transition"
@@ -109,15 +196,21 @@ export default function Fines() {
             <FaFilePdf /> Export to PDF
           </button>
         )}
+        </div>
+        
       </div>
+
+      
 
       {/* Tab Content */}
       <div className="bg-white shadow rounded-xl p-4 overflow-x-auto">
-        {activeTab === "unpaid" && (
-          <>
-            {filteredUnpaid.length === 0 ? (
-              <p className="text-gray-500">No unpaid fines found.</p>
-            ) : (
+        {loading ? (
+          <p className="text-gray-600">Loading fines...</p>
+        ) : activeTab === "unpaid" ? (
+          filteredUnpaid.length === 0 ? (
+            <p className="text-gray-500">No unpaid fines found.</p>
+          ) : (
+            <>
               <table className="w-full text-sm text-left border-collapse min-w-[500px]">
                 <thead>
                   <tr className="text-gray-600 border-b">
@@ -130,18 +223,16 @@ export default function Fines() {
                 </thead>
                 <tbody>
                   {filteredUnpaid.map((fine, idx) => (
-                    <tr
-                      key={idx}
-                      className="hover:bg-gray-50 transition border-b last:border-none"
-                    >
+                    <tr key={idx} className="hover:bg-gray-50 transition border-b last:border-none">
                       <td className="py-3">{fine.title}</td>
-                      <td>{fine.dueDate}</td>
+                      <td>{fine.due_date}</td>
                       <td>₹{fine.amount}</td>
+                      <td><span className="text-red-500 font-medium">Unpaid</span></td>
                       <td>
-                        <span className="text-red-500 font-medium">{fine.status}</span>
-                      </td>
-                      <td>
-                        <button className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition">
+                        <button
+                          onClick={() => handlePay(fine)}
+                          className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition"
+                        >
                           Pay Now
                         </button>
                       </td>
@@ -149,55 +240,51 @@ export default function Fines() {
                   ))}
                 </tbody>
               </table>
-            )}
 
-            {totalUnpaid > 0 && (
-              <div className="mt-4 flex justify-between items-center">
-                <span className="font-medium">Total Due: ₹{totalUnpaid}</span>
-                <button className="px-4 py-1 bg-green-600 text-white rounded shadow hover:bg-green-700 transition">
-                  Pay All Fines
-                </button>
-              </div>
-            )}
-          </>
-        )}
-
-        {activeTab === "history" && (
-          <>
-            {filteredPaid.length === 0 ? (
-              <p className="text-gray-500">No payment history found.</p>
-            ) : (
-              <table className="w-full text-sm text-left border-collapse min-w-[500px]">
-                <thead>
-                  <tr className="text-gray-600 border-b">
-                    <th className="py-3">Book Title</th>
-                    <th>Paid On</th>
-                    <th>Amount</th>
-                    <th>Transaction ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPaid.map((fine, idx) => (
-                    <tr
-                      key={idx}
-                      className="hover:bg-gray-50 transition border-b last:border-none"
-                    >
-                      <td className="py-3">{fine.title}</td>
-                      <td>{fine.paidOn}</td>
-                      <td>₹{fine.amount}</td>
-                      <td>{fine.txnId}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </>
+              {totalUnpaid > 0 && (
+                <div className="mt-6 flex justify-between items-center">
+                  <span className="font-medium">Total Due: ₹{totalUnpaid}</span>
+                  <button
+                    onClick={handlePayAll}
+                    className="px-4 py-1 mr-20 bg-green-600 text-white rounded shadow hover:bg-green-700 transition"
+                  >
+                    Pay All
+                  </button>
+                </div>
+              )}
+            </>
+          )
+        ) : filteredPaid.length === 0 ? (
+          <p className="text-gray-500">No payment history found.</p>
+        ) : (
+          <table className="w-full text-sm text-left border-collapse min-w-[500px]">
+            <thead>
+              <tr className="text-gray-600 border-b">
+                <th className="py-3">Book Title</th>
+                <th>Paid On</th>
+                <th>Amount</th>
+                <th>Transaction ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPaid.map((fine, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 transition border-b last:border-none">
+                  <td className="py-3">{fine.title}</td>
+                  <td>{fine.paid_on}</td>
+                  <td>₹{fine.amount}</td>
+                  <td className="flex items-center gap-2">
+                    <FaCheckCircle className="text-green-500" /> {fine.txn_id}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
       {/* Helpful Info */}
       <div className="bg-white shadow rounded-xl p-4 space-y-2 text-sm text-gray-600">
-        <p>💡 Fine Policy: ₹5 per day overdue.</p>
+        <p>💡 Fine Policy: ₹10 per day overdue after due date.</p>
         <p>
           💬 For disputes,{" "}
           <a href="/dashboard/student/support" className="text-blue-500 hover:underline">

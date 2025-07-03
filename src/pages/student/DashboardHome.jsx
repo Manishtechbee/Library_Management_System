@@ -30,6 +30,7 @@ export default function DashboardHome() {
   const user = JSON.parse(localStorage.getItem("user"));
   const studentName = user?.name || "Student";
   const [announcements, setAnnouncements] = useState([]);
+  console.log(announcements);
 
  useEffect(() => {
   if (!user?.id) return;
@@ -65,10 +66,11 @@ const calculateProfileCompletion = (profileData) => {
 const [systemNotifications, setSystemNotifications] = useState([]);
 
 useEffect(() => {
-  fetch(`http://localhost:5000/api/system-notifications`)
+  fetch(`http://localhost:5000/api/`)
     .then(res => res.json())
     .then(data => {
       setSystemNotifications(data);
+      console.log(data);
 
       // Show persistent toast for each notification
       data.forEach(note => {
@@ -97,11 +99,6 @@ useEffect(() => {
 
 
   useEffect(() => {
-  fetch(`http://localhost:5000/api/announcements?role=${user.role}`)
-    .then(res => res.json())
-    .then(data => setAnnouncements(data))
-    .catch(err => console.error(err));
-
   fetch(`http://localhost:5000/api/activity/${user.id}`)
     .then(res => res.json())
     .then(data => setActivityList(data))
@@ -110,7 +107,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-  fetch(`http://localhost:5000/api/announcements?role=${user.role}`)
+  fetch(`http://localhost:5000/api/?role=${user.role}`)
     .then(res => res.json())
     .then(data => setAnnouncements(data))
     .catch(err => console.error(err));
@@ -140,7 +137,7 @@ useEffect(() => {
 
   return (
     <>
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       
      {/* Welcome Message with Notification */}
 <motion.div
@@ -262,6 +259,7 @@ useEffect(() => {
   >
     <div className="bg-white shadow rounded-lg p-4 flex flex-col h-full">
       <h2 className="font-semibold text-gray-700 mb-2">Announcements</h2>
+      
       {announcements.length === 0 ? (
         <p className="text-gray-500 flex-grow">No announcements available.</p>
       ) : (

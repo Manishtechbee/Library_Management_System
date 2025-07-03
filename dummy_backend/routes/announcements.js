@@ -5,6 +5,7 @@ const db = require('../config/db');
 // Get all relevant announcements
 router.get('/', (req, res) => {
   const role = req.query.role || 'all';
+  console.log(role);
 
   const sql = `
     SELECT * FROM announcements

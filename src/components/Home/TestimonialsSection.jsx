@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-export default function TestimonialsSection() {
+export default function TestimonialsSection({darkMode}) {
   const testimonials = [
     {
       name: "Priya Sharma",
@@ -39,41 +39,48 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="bg-white py-20">
-      <div className="max-w-6xl mx-auto px-6 text-center">
+    <section className={`${darkMode ? "bg-gray-900" : "bg-white"} py-20`}>
+  <div className="max-w-6xl mx-auto px-6 text-center">
 
-        <motion.h2
-          className="text-3xl font-bold text-[#1b365d] mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          viewport={{ amount: 0.3 }}
-        >
-          What Users Say
-        </motion.h2>
+    <motion.h2
+      className={`text-3xl font-bold mb-10 ${darkMode ? "text-white" : "text-[#1b365d]"}`}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      viewport={{ amount: 0.3 }}
+    >
+      What Users Say
+    </motion.h2>
 
+    <motion.div
+      className="grid gap-8 md:grid-cols-3"
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ amount: 0.3 }}
+    >
+      {testimonials.map(({ name, role, text }) => (
         <motion.div
-          className="grid gap-8 md:grid-cols-3"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ amount: 0.3 }}
+          key={name}
+          className={`shadow-md p-6 rounded-lg text-left border hover:shadow-lg transition ${
+            darkMode ? "bg-gray-800 text-white border-gray-700" : "bg-[#f3f8fd] text-[#1b365d] border-gray-200"
+          }`}
+          variants={cardVariants}
+          whileHover={{ scale: 1.03 }}
         >
-          {testimonials.map(({ name, role, text }) => (
-            <motion.div
-              key={name}
-              className="bg-[#f3f8fd] shadow-md p-6 rounded-lg text-left border hover:shadow-lg transition"
-              variants={cardVariants}
-              whileHover={{ scale: 1.03 }}
-            >
-              <p className="text-gray-700 italic mb-4">“{text}”</p>
-              <div className="text-sm font-semibold text-[#1b365d]">{name}</div>
-              <div className="text-xs text-gray-500">{role}</div>
-            </motion.div>
-          ))}
+          <p className={`italic mb-4 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+            “{text}”
+          </p>
+          <div className="text-sm font-semibold">{name}</div>
+          <div className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+            {role}
+          </div>
         </motion.div>
+      ))}
+    </motion.div>
 
-      </div>
-    </section>
+  </div>
+</section>
+
   );
 }

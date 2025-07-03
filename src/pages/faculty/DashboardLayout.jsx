@@ -7,7 +7,7 @@ export default function DashboardLayout({chatOpen, setChatOpen}) {
     <div className="flex min-h-screen bg-[#f4f8fb]">
       <Sidebar />
       {/* Main Content */}
-      <div className="flex-1 p-6 bg-[#ffffff] shadow-inner">
+      <div className="flex-1 bg-[#ffffff] shadow-inner">
         
       
         <Outlet />

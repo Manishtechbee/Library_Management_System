@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaSearch, FaFilePdf, FaBookmark, FaGlobe, FaBookOpen } from "react-icons/fa";
+import axios from "axios";
+
+import { toast, ToastContainer } from "react-toastify";
 
 export default function EResourcesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -8,62 +11,57 @@ export default function EResourcesPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [activeSection, setActiveSection] = useState("All");
 
-  const [resources, setResources] = useState([
-  {
-    id: 1,
-    title: "Introduction to AI",
-    type: "PDF",
-    section: "Notes",
-    description: "Beginner-friendly guide to Artificial Intelligence.",
-    bookmarked: true,
-    link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
-  },
-  {
-    id: 2,
-    title: "Latest Research on Neural Networks",
-    type: "Research Paper",
-    section: "PYQs",
-    description: "A comprehensive research publication on deep learning models.",
-    bookmarked: false,
-    link: "https://arxiv.org/pdf/2106.14899.pdf"
-  },
-  {
-    id: 3,
-    title: "Web Development Fundamentals",
-    type: "eBook",
-    section: "eBooks",
-    description: "Complete eBook covering modern web development.",
-    bookmarked: false,
-    link: "https://www.hq.nasa.gov/alsj/a17/A17_FlightPlan.pdf"
-  },
-  {
-    id: 4,
-    title: "Python Basics Notes",
-    type: "PDF",
-    section: "Notes",
-    description: "Concise notes for Python beginners.",
-    bookmarked: false,
-    link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
-  },
-  {
-    id: 5,
-    title: "Science Journal - AI Edition",
-    type: "Research Paper",
-    section: "Journals",
-    description: "Latest peer-reviewed journal on AI advancements.",
-    bookmarked: false,
-    link: "https://arxiv.org/pdf/2106.14899.pdf"
-  }
-]);
+  const [resources, setResources] = useState([]);
 
 
-  const toggleBookmark = (id) => {
-    setResources((prev) =>
-      prev.map((res) =>
-        res.id === id ? { ...res, bookmarked: !res.bookmarked } : res
+  const user = JSON.parse(localStorage.getItem("user"));
+
+
+  
+ const toggleBookmark = (id) => {
+  const userId = user.id;
+
+  // If in "All" tab → Only allow adding bookmark
+  if (activeTab === "all") {
+    // Optimistically add bookmark
+    setResources((prevResources) =>
+      prevResources.map((res) =>
+        res.id === id ? { ...res, bookmarked: 1 } : res
       )
     );
-  };
+
+    axios
+      .put(`http://localhost:5000/api/bookmarks/${id}/bookmark`, { user_id: userId })
+      .then(() => {
+        toast.success("Bookmarked!");
+      })
+      .catch(() => {
+        toast.error("Failed to bookmark");
+        fetchResources(); // Reset UI if failed
+      });
+  }
+
+  // If in "Bookmarked" tab → Allow only removing bookmark
+  if (activeTab === "bookmarked") {
+    axios
+      .put(`http://localhost:5000/api/bookmarks/${id}/bookmark`, { user_id: userId })
+      .then(() => {
+        toast.success("Bookmark removed!");
+
+        // Immediately remove from UI
+        setResources((prevResources) => prevResources.filter((res) => res.id !== id));
+      })
+      .catch(() => {
+        toast.error("Failed to remove bookmark");
+        fetchResources(); // Reset UI if failed
+      });
+  }
+};
+
+
+
+
+  
 
   const filteredResources = resources.filter((res) => {
     const matchesSearch = res.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -73,8 +71,30 @@ export default function EResourcesPage() {
     return matchesSearch && matchesType && matchesTab && matchesSection;
   });
 
+
+
+  useEffect(() => {
+  fetchResources();
+}, [activeTab]);
+
+  const fetchResources = () => {
+    const url =
+    activeTab === "bookmarked"
+      ? `http://localhost:5000/api/bookmarks/bookmarked?user_id=${user.id}`
+      : `http://localhost:5000/api`
+
+  axios.get(url)
+    .then((res) => {
+      console.log(res);
+      setResources(res.data);
+    })
+    .catch(() => toast.error("Failed to load resources"));
+};
+
+
+
   return (
-    <div className="w-full p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="w-full p-6 space-y-6 max-w-7xl ">
       {/* Heading */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h2 className="text-3xl font-bold text-[#1b365d] mb-2">E-Resources Library</h2>
@@ -87,7 +107,7 @@ export default function EResourcesPage() {
           <button
             key={section}
             onClick={() => setActiveSection(section)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`px-4 py-2 rounded-lg text-md font-medium transition ${
               activeSection === section ? "bg-[#3a7ce1] text-white" : "bg-white shadow text-gray-700 hover:bg-[#dceafb]"
             }`}
           >
@@ -102,7 +122,7 @@ export default function EResourcesPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`px-4 py-3 rounded-lg text-md font-medium transition ${
               activeTab === tab ? "bg-[#3a7ce1] text-white" : "bg-white shadow text-gray-700 hover:bg-[#dceafb]"
             }`}
           >
@@ -144,7 +164,7 @@ export default function EResourcesPage() {
           filteredResources.map((res) => (
             <motion.div
               key={res.id}
-              className="bg-white shadow-md p-4 rounded-lg flex flex-col gap-2 hover:shadow-lg transition h-full"
+              className="bg-white shadow-md p-5 rounded-lg flex flex-col gap-2 hover:shadow-lg transition h-full"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -159,24 +179,28 @@ export default function EResourcesPage() {
                   <FaBookOpen className="text-green-500" />
                 )}
               </div>
-              <p className="text-gray-600 text-sm">{res.description}</p>
-              <span className="text-xs text-gray-500 italic">Section: {res.section}</span>
+              <p className="text-gray-600 text-md">{res.description}</p>
+              <span className="text-sm text-gray-500 italic">Section: {res.section}</span>
               <div className="flex gap-2 mt-auto">
                 <a
                   href={res.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 px-3 py-1 text-center bg-[#3a7ce1] hover:bg-[#285dad] text-white rounded text-sm"
+                  className="flex-1 px-3 py-1 text-center bg-[#3a7ce1] hover:bg-[#285dad] text-white rounded text-md"
                 >
                   View / Download
                 </a>
-                <button
-                  onClick={() => toggleBookmark(res.id)}
-                  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm flex items-center gap-1"
-                >
-                  <FaBookmark className={`${res.bookmarked ? "text-yellow-500" : "text-gray-400"}`} />
-                  {res.bookmarked ? "Bookmarked" : "Bookmark"}
-                </button>
+               <button
+  onClick={() => {
+    if (activeTab === "all" && res.bookmarked) return; // Disable unbookmark in 'all' tab
+    toggleBookmark(res.id);
+  }}
+  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-md flex items-center gap-1"
+>
+  <FaBookmark className={`${res.bookmarked ? "text-yellow-500" : "text-gray-400"}`} />
+  {res.bookmarked ? "Bookmarked" : "Bookmark"}
+</button>
+
               </div>
             </motion.div>
           ))

@@ -4,6 +4,7 @@ const db = require('../config/db');
 const multer = require('multer');
 const path = require('path');
 
+const logActivity = require('../utils/logActivity');
 // File Upload Setup
 const storage = multer.diskStorage({
   destination: './uploads/certificates',
@@ -32,6 +33,8 @@ router.post('/request', (req, res) => {
     db.query(insertSql, [userId, studentName, student_id, year, department, semester], (err) => {
       if (err) return res.status(500).json({ message: 'Database error' });
       res.json({ message: 'No Dues request submitted' });
+       // Log Activity
+      logActivity(userId, "Submitted a No Dues request").catch(console.error("No dues not able to submit"));
     });
   });
 });

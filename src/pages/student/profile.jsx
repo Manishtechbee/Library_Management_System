@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import NoDuesRequest from "../../components/NoDues";
+import { FaDownload } from "react-icons/fa";
+
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import QRCode from "qrcode";
@@ -9,18 +11,13 @@ import QRCode from "qrcode";
 
 export default function Profile() {
   const navigate=useNavigate();
+  const [complaintSubject, setComplaintSubject] = useState("");
+const [complaintDescription, setComplaintDescription] = useState("");
+
   
   const u = JSON.parse(localStorage.getItem("user"));
   const role = u?.role;
-  const [user, setUser] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    student_id: "",
-    department: "",
-    year: ""
-  });
+  
 
 useEffect(() => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -82,21 +79,48 @@ const downloadNoDuesPDF = () => {
 
   doc.save("NoDuesRequest.pdf");
 };
+const [user, setUser] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    student_id: "",
+    department: "",
+    year: ""
+  });
 
 
  const [qrImageUrl, setQrImageUrl] = useState("");
 
   useEffect(() => {
-    
-    if (u?.student_id) {
-      QRCode.toDataURL(u)
-        .then(url => setQrImageUrl(url))
-        .catch(err => console.error(err));
-    }
-  }, [u?.id]);
+  if (u?.id) {
+    const qrData = JSON.stringify({
+      name: user.name,
+      email: user.email,
+      student_id: user.student_id,
+      department: user.department,
+      year: user.year,
+      id: u.id,
+    });
+    QRCode.toDataURL(qrData, {
+      color: {
+        dark: "#1f2937",  // Tailwind's gray-500
+        light: "#ffffff", // Background remains white
+      },
+    })
+      .then(url => setQrImageUrl(url))
+      .catch(err => console.error(err));
+  }
+}, [u?.id,user]);
+
 
   return (
-    <div className="max-w-2xl py-4 px-15">
+    <>
+    
+     <div className="flex flex-col lg:flex-row gap-6 p-6 max-w-7xl mx-auto">
+      
+    <div className="w-full lg:w-1/3 space-y-6 bg-white p-6 rounded-xl shadow">
+    
       
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
@@ -190,15 +214,18 @@ const downloadNoDuesPDF = () => {
       <div className="mt-6 space-y-2">
         <h3 className="text-base font-medium text-gray-700 mb-2">Student ID QR Code</h3>
         {qrImageUrl ? (
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-wrap items-start gap-2">
             <img src={qrImageUrl} alt="Student ID QR Code" className="w-32 h-32" />
-            <a
-              href={qrImageUrl}
-              download={`StudentID-${u.student_id}.png`}
-              className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-            >
-              Download QR Code
-            </a>
+            
+        <a
+  href={qrImageUrl}
+  download={`StudentID-${u.id}.png`}
+  className="p-2 mt-auto mb-4 bg-[#303336] text-white rounded hover:bg-[#28292a] transition flex items-center justify-center"
+>
+  <FaDownload className="w-3 h-3" />
+</a>
+
+      
           </div>
         ) : (
           <p className="text-gray-500">Generating QR Code...</p>
@@ -217,14 +244,17 @@ const downloadNoDuesPDF = () => {
         </button>
       </div>
 
-      <NoDuesRequest userId={u.id}/>
+      
+
+    </div>
+    <div className="flex-1 space-y-6 bg-white p-6 rounded-xl shadow">
+        <NoDuesRequest userId={u.id}/>
 
 {/* No Dues Request Details Table */}
 {noDues && (
   <div className="space-y-4 mb-6 mt-6">
-    <h3 className="text-base font-medium text-gray-700 mb-2">No Dues Request Details</h3>
     
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto bg-white p-6 rounded-xl shadow">
       <table className="min-w-full text-sm">
         <thead>
           <tr className="bg-gray-100 text-left">
@@ -253,11 +283,11 @@ const downloadNoDuesPDF = () => {
             
             <td className="p-2">
             <button
-    onClick={downloadNoDuesPDF}
+     onClick={noDues === "approved" ? downloadNoDuesPDF : undefined}
     className={`px-4 py-2 text-white rounded text-sm transition ${
-      noDues =="approved"? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"
+      noDues ==="approved"? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"
     }`}
-    disabled={!noDues}
+    disabled={noDues !== "approved"}
   >
     Download as PDF
   </button></td>
@@ -271,7 +301,7 @@ const downloadNoDuesPDF = () => {
 
 
 {/* Book Issue Request Status Section */}
-<div className="space-y-4 mb-6">
+<div className="bg-white p-6 rounded-xl shadow">
   <h3 className="text-base font-medium text-gray-700 mb-2">Book Issue Requests</h3>
   
   <div className="overflow-x-auto">
@@ -305,7 +335,83 @@ const downloadNoDuesPDF = () => {
     </table>
   </div>
 </div>
+<div className="bg-white p-6 rounded-xl shadow mt-6">
+  <h3 className="text-base font-medium text-gray-700 mb-4">Submit a Complaint</h3>
+
+  <form
+    className="space-y-4"
+    onSubmit={(e) => {
+      e.preventDefault();
+      if (!complaintSubject || !complaintDescription) {
+        alert("Please fill all fields");
+        return;
+      }
+      const complaintData = {
+        user_id: u.id,
+        subject: complaintSubject,
+        description: complaintDescription,
+      };
+
+      fetch("http://localhost:5000/api/complaints/complaints/add", {  // Corrected URL
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(complaintData),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Request failed");
+          return res.json();
+        })
+        .then((data) => {
+          if (data.success) {
+            alert("Complaint submitted successfully!");
+            setComplaintSubject("");
+            setComplaintDescription("");
+          } else {
+            alert("Failed to submit complaint. Please try again.");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("Error occurred while submitting complaint.");
+        });
+    }}
+  >
+    <div>
+      <label className="text-sm text-gray-600">Subject</label>
+      <input
+        type="text"
+        value={complaintSubject || ""}
+        onChange={(e) => setComplaintSubject(e.target.value)}
+        className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
+        placeholder="Enter complaint subject"
+        required
+      />
+    </div>
+
+    <div>
+      <label className="text-sm text-gray-600">Description</label>
+      <textarea
+        value={complaintDescription || ""}
+        onChange={(e) => setComplaintDescription(e.target.value)}
+        className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
+        placeholder="Describe your complaint"
+        rows="4"
+        required
+      />
+    </div>
+
+    <button
+      type="submit"
+      className="px-5 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition"
+    >
+      Submit Complaint
+    </button>
+  </form>
+</div>
 
     </div>
+    
+  </div>
+    </>
   );
 }

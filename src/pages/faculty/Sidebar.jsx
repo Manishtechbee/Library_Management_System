@@ -103,7 +103,7 @@ export default function Sidebar() {
             E-Resources
           </NavLink>
 
-          <NavLink
+          {/*<NavLink
             to={`/dashboard/${role}/announcements`}
             className={({ isActive }) =>
               `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] ${
@@ -113,7 +113,7 @@ export default function Sidebar() {
           >
             <FaBullhorn />
             Announcements
-          </NavLink>
+          </NavLink>*/}
         </nav>
 
         {/* Role Specific Links */}
@@ -164,7 +164,7 @@ export default function Sidebar() {
           {role === "faculty" && (
             <>
               <NavLink
-                to={`/dashboard/${role}/issued-books`}
+                to={`/dashboard/faculty/MyBooks`}
                 className={({ isActive }) =>
                   `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] ${
                     isActive ? "bg-[#dceafb] font-medium text-[#1b365d]" : "text-gray-700"
@@ -175,8 +175,8 @@ export default function Sidebar() {
                 Issued Books
               </NavLink>
 
-              <NavLink
-                to={`/dashboard/${role}/student-supervision`}
+              {/*<NavLink
+                to={`/dashboard/faculty/refer`}
                 className={({ isActive }) =>
                   `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] ${
                     isActive ? "bg-[#dceafb] font-medium text-[#1b365d]" : "text-gray-700"
@@ -185,7 +185,7 @@ export default function Sidebar() {
               >
                 <FaGraduationCap />
                 Student Supervision
-              </NavLink>
+              </NavLink>*/}
 
               <NavLink
                 to={`/dashboard/${role}/fines`}
@@ -200,7 +200,7 @@ export default function Sidebar() {
               </NavLink>
 
               <NavLink
-                to={`/dashboard/${role}/recommendations`}
+                to={`/dashboard/faculty/recommendations`}
                 className={({ isActive }) =>
                   `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] ${
                     isActive ? "bg-[#dceafb] font-medium text-[#1b365d]" : "text-gray-700"
@@ -211,7 +211,7 @@ export default function Sidebar() {
                 Recommendations
               </NavLink>
 
-              <NavLink
+             {/* <NavLink
                 to={`/dashboard/${role}/reports`}
                 className={({ isActive }) =>
                   `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] ${
@@ -221,7 +221,7 @@ export default function Sidebar() {
               >
                 <FaChartBar />
                 Reports & Insights
-              </NavLink>
+              </NavLink>*/}
             </>
           )}
 

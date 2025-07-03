@@ -10,7 +10,7 @@ router.get('/:id', (req, res) => {
     SELECT 
       (SELECT COUNT(*) FROM borrowed_books WHERE user_id = ?) AS totalIssued,
       (SELECT COUNT(*) FROM borrowed_books WHERE user_id = ? AND due_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)) AS dueSoon,
-      (SELECT IFNULL(SUM(fine_amount), 0) FROM fines WHERE user_id = ?) AS unpaidFines
+      (SELECT IFNULL(SUM(fine_amount), 0) FROM fines WHERE user_id = ? AND paid=0) AS unpaidFines
   `;
 
   db.query(statsQuery, [userId, userId, userId], (err, statsResult) => {

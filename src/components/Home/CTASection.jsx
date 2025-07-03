@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-export default function CTASection() {
+export default function CTASection({darkMode}) {
    const navigate = useNavigate();
 
 const handleGetStarted = () => {
@@ -38,29 +38,36 @@ const handleGetStarted = () => {
   };
 
   return (
-    <section className="bg-[#1b365d] text-white py-20">
-      <motion.div
-        className="max-w-4xl mx-auto px-6 text-center"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ amount: 0.3 }} // Triggers every time at 30% visibility
-      >
-        <h2 className="text-3xl font-bold mb-4">Ready to transform your library?</h2>
-        <p className="mb-6 text-gray-300 text-lg">
-          Join hundreds of students and faculty using our system to manage their digital library experience with ease.
-        </p>
+   <section className={`${darkMode ? "bg-gradient-to-r from-[#020e1f] to-[#08213e]" : "bg-[#1b365d]"} text-white py-20`}>
+  <motion.div
+    className="max-w-4xl mx-auto px-6 text-center"
+    variants={containerVariants}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ amount: 0.3 }}
+  >
+    <h2 className="text-3xl font-bold mb-4">Ready to transform your library?</h2>
+    <p className={`mb-6 text-lg ${
+      darkMode ? "text-gray-300" : "text-gray-300"
+    }`}>
+      Join hundreds of students and faculty using our system to manage their digital library experience with ease.
+    </p>
 
-        <motion.a
-          onClick={handleGetStarted}
-          className="inline-block bg-white text-[#1b365d] font-semibold px-6 py-3 rounded-lg hover:bg-gray-200 transition"
-          variants={buttonVariants}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Get Started Now
-        </motion.a>
-      </motion.div>
-    </section>
+    <motion.a
+      onClick={handleGetStarted}
+      className={`inline-block font-semibold px-6 py-3 rounded-lg transition ${
+        darkMode
+          ? "bg-white text-[#091a2f] hover:bg-gray-200"
+          : "bg-white text-[#1b365d] hover:bg-gray-200"
+      }`}
+      variants={buttonVariants}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      Get Started Now
+    </motion.a>
+  </motion.div>
+</section>
+
   );
 }
