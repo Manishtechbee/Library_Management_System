@@ -1,4 +1,5 @@
-{/*import { useState, useEffect } from "react";
+{
+  /*import { useState, useEffect } from "react";
 import { FaBook, FaCalendarAlt, FaClock, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -179,7 +180,8 @@ export default function IssuedBooks() {
     </div>
   );
 }
-*/}
+*/
+}
 import { useState, useEffect } from "react";
 import { FaBook, FaCalendarAlt, FaClock, FaSearch } from "react-icons/fa";
 import axios from "axios";
@@ -188,26 +190,18 @@ import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
 import ConfirmModal from "../../components/general/ConfirmModal";
 
-export default function IssuedBooks() {
+export default function IssuedBooks({ darkMode }) {
   const [confirmModal, setConfirmModal] = useState({
-  visible: false,
-  message: "",
-  onConfirm: () => {},
-});
+    visible: false,
+    message: "",
+    onConfirm: () => {},
+  });
 
   const user = JSON.parse(localStorage.getItem("user"));
   const [issuedBooks, setIssuedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
-const [darkMode, setDarkMode] = useState(false);
-
-useEffect(() => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  if (storedUser?.dark_mode) {
-    setDarkMode(true);
-  }
-}, []);
 
   const today = new Date();
 
@@ -248,36 +242,37 @@ useEffect(() => {
       .finally(() => setLoading(false));
   }, [user.id]);
 
-
   const fetchIssuedBooks = () => {
-  setLoading(true);
-  axios
-    .get(`http://localhost:5000/api/my-issued-books/${user.id}`)
-    .then(async (res) => {
-      const booksWithImages = await Promise.all(
-        res.data.map(async (book) => {
-          try {
-            const googleRes = await axios.get(
-              `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(
-                book.title
-              )}+inauthor:${encodeURIComponent(book.author)}&maxResults=1`
-            );
-            const googleBook = googleRes.data.items?.[0]?.volumeInfo || {};
-            const image =
-              googleBook.imageLinks?.thumbnail ||
-              `https://picsum.photos/200/300?random=${book.id}`;
-            return { ...book, image };
-          } catch {
-            return { ...book, image: `https://picsum.photos/200/300?random=${book.id}` };
-          }
-        })
-      );
-      setIssuedBooks(booksWithImages);
-    })
-    .catch(() => toast.error("Failed to load issued books"))
-    .finally(() => setLoading(false));
-};
-
+    setLoading(true);
+    axios
+      .get(`http://localhost:5000/api/my-issued-books/${user.id}`)
+      .then(async (res) => {
+        const booksWithImages = await Promise.all(
+          res.data.map(async (book) => {
+            try {
+              const googleRes = await axios.get(
+                `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(
+                  book.title
+                )}+inauthor:${encodeURIComponent(book.author)}&maxResults=1`
+              );
+              const googleBook = googleRes.data.items?.[0]?.volumeInfo || {};
+              const image =
+                googleBook.imageLinks?.thumbnail ||
+                `https://picsum.photos/200/300?random=${book.id}`;
+              return { ...book, image };
+            } catch {
+              return {
+                ...book,
+                image: `https://picsum.photos/200/300?random=${book.id}`,
+              };
+            }
+          })
+        );
+        setIssuedBooks(booksWithImages);
+      })
+      .catch(() => toast.error("Failed to load issued books"))
+      .finally(() => setLoading(false));
+  };
 
   const filteredBooks = issuedBooks.filter((book) => {
     const matchesSearch =
@@ -296,52 +291,52 @@ useEffect(() => {
   });
 
   const handleRenewRequest = (borrowId, user_id) => {
-  setConfirmModal({
-    visible: true,
-    message: "Are you sure you want to request renewal for this book?",
-    onConfirm: () => {
-      axios.post(`http://localhost:5000/api/request-renewal/${borrowId}`, {
-        user_id: user_id,
-      })
-      .then(() => {
-        toast.success("Renewal requested successfully");
-        setIssuedBooks((prev) =>
-          prev.map((book) =>
-            book.borrow_id === borrowId ? { ...book, renewal_requested: 1 } : book
-          )
-        );
-      })
-      .catch(() => toast.error("Failed to request renewal"));
-      setConfirmModal({ visible: false, message: "", onConfirm: () => {} });
-    },
-  });
-};
-
-
-
+    setConfirmModal({
+      visible: true,
+      message: "Are you sure you want to request renewal for this book?",
+      onConfirm: () => {
+        axios
+          .post(`http://localhost:5000/api/request-renewal/${borrowId}`, {
+            user_id: user_id,
+          })
+          .then(() => {
+            toast.success("Renewal requested successfully");
+            setIssuedBooks((prev) =>
+              prev.map((book) =>
+                book.borrow_id === borrowId
+                  ? { ...book, renewal_requested: 1 }
+                  : book
+              )
+            );
+          })
+          .catch(() => toast.error("Failed to request renewal"));
+        setConfirmModal({ visible: false, message: "", onConfirm: () => {} });
+      },
+    });
+  };
 
   const handleReturn = (borrowId) => {
-  setConfirmModal({
-    visible: true,
-    message: "Are you sure you want to mark this book as returned?",
-    onConfirm: () => {
-      axios.put(`http://localhost:5000/api/return/${borrowId}`)
-        .then(() => {
-          toast.success("Book marked as returned");
-          setIssuedBooks((prev) =>
-            prev.map((book) =>
-              book.id === borrowId ? { ...book, returned_date: new Date().toISOString() } : book
-            )
-          );
-        })
-        .catch(() => toast.error("Failed to mark as returned"));
-      setConfirmModal({ visible: false, message: "", onConfirm: () => {} });
-    },
-  });
-};
-
-
-
+    setConfirmModal({
+      visible: true,
+      message: "Are you sure you want to mark this book as returned?",
+      onConfirm: () => {
+        axios
+          .put(`http://localhost:5000/api/return/${borrowId}`)
+          .then(() => {
+            toast.success("Book marked as returned");
+            setIssuedBooks((prev) =>
+              prev.map((book) =>
+                book.id === borrowId
+                  ? { ...book, returned_date: new Date().toISOString() }
+                  : book
+              )
+            );
+          })
+          .catch(() => toast.error("Failed to mark as returned"));
+        setConfirmModal({ visible: false, message: "", onConfirm: () => {} });
+      },
+    });
+  };
 
   const overdueCount = issuedBooks.filter(
     (book) => new Date(book.due_date) < today && !book.returned_date
@@ -349,157 +344,321 @@ useEffect(() => {
 
   return (
     <>
-    <div className="max-w-6xl p-6 space-y-6">
-      <h2 className="text-3xl font-bold text-[#1b365d]">My Issued Books</h2>
+      {darkMode?(<><div className="max-w-6xl p-6 space-y-6">
+  <h2 className="text-3xl font-bold text-[#1b365d] dark:text-white">My Issued Books</h2>
 
-      <div className="w-full p-4 flex flex-wrap items-center gap-4 justify-between">
-  <div className="text-gray-800 font-medium text-base">
-    Total Issued: {issuedBooks.length} | Overdue:{" "}
-    <span className={overdueCount>0?"text-red-500":"text-black-500"}>{overdueCount}</span>
-  </div>
-
-  <div className="flex flex-wrap gap-3 items-center">
-    <div className="relative">
-      <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-      <input
-        type="text"
-        placeholder="Search by title or author"
-        className="pl-9 pr-4 py-2 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white placeholder-gray-400 w-48 md:w-60"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+  <div className="w-full p-4 flex flex-wrap items-center gap-4 justify-between bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div className="text-gray-800 dark:text-gray-200 font-medium text-base">
+      Total Issued: {issuedBooks.length} | Overdue:{" "}
+      <span className={overdueCount > 0 ? "text-red-500" : "text-green-500"}>
+        {overdueCount}
+      </span>
     </div>
 
-    <select
-      value={filter}
-      onChange={(e) => setFilter(e.target.value)}
-      className="px-3 py-2 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white text-gray-700"
-    >
-      <option value="all">All Books</option>
-      <option value="overdue">Overdue Only</option>
-      <option value="dueSoon">Due in 3 Days</option>
-    </select>
+    <div className="flex flex-wrap gap-3 items-center">
+      <div className="relative">
+        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search by title or author"
+          className="pl-9 pr-4 py-2 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 w-48 md:w-60"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <select
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        className="px-3 py-2 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
+      >
+        <option value="all">All Books</option>
+        <option value="overdue">Overdue Only</option>
+        <option value="dueSoon">Due in 3 Days</option>
+      </select>
+    </div>
   </div>
-</div>
 
+  {loading ? (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div
+          key={index}
+          className="p-4 w-72 mx-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md animate-pulse flex flex-col gap-3"
+        >
+          <div className="w-full h-40 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+          <div className="flex justify-center gap-2 mt-4">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : filteredBooks.length === 0 ? (
+    <p className="text-gray-600 dark:text-gray-400 mt-4">No books found.</p>
+  ) : (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">
+      {filteredBooks.map((book) => {
+        const dueDate = new Date(book.due_date);
+        const isOverdue = dueDate < today;
+        const dueIn3Days =
+          dueDate - today <= 3 * 24 * 60 * 60 * 1000 && dueDate >= today;
 
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <div
-              key={index}
-              className="p-4 w-72 mx-auto rounded-lg border border-gray-200 bg-white shadow-md animate-pulse flex flex-col gap-3"
-            >
-              <div className="w-full h-40 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-              <div className="h-3 bg-gray-200 rounded w-1/2" />
-              <div className="h-3 bg-gray-200 rounded w-2/3" />
-              <div className="flex justify-center gap-2 mt-4">
-                <div className="h-8 bg-gray-200 rounded w-24" />
-                <div className="h-8 bg-gray-200 rounded w-24" />
+        return (
+          <motion.div
+            key={book.borrow_id}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="p-4 w-80 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2F3B53] shadow-md flex flex-col gap-3 hover:shadow-lg transition"
+          >
+            {book.image ? (
+              <img
+                src={book.image}
+                alt={book.title}
+                className="w-full h-40 object-contain rounded"
+              />
+            ) : (
+              <div className="w-full h-40 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400 text-sm">
+                No Image Available
               </div>
+            )}
+
+            <h3 className="text-lg font-medium text-[#1b365d] dark:text-white flex items-center gap-2">
+              <FaBook /> {book.title}
+            </h3>
+
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              Author: {book.author}
+            </p>
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              Issued On: {new Date(book.borrowed_date).toLocaleDateString()}
+            </p>
+
+            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <FaClock />
+              <span>Due Date: {dueDate.toLocaleDateString()}</span>
             </div>
-          ))}
-        </div>
-      ) : filteredBooks.length === 0 ? (
-        <p className="text-gray-600 mt-4">No books found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">
-          {filteredBooks.map((book) => {
-            const dueDate = new Date(book.due_date);
-            const isOverdue = dueDate < today;
-            const dueIn3Days =
-              dueDate - today <= 3 * 24 * 60 * 60 * 1000 && dueDate >= today;
 
-            return (
-              <motion.div
-                key={book.borrow_id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="p-4 w-80 rounded-lg border border-gray-200 bg-white shadow-md flex flex-col gap-3 hover:shadow-lg transition"
-              >
-                {book.image ? (
-                  <img
-                    src={book.image}
-                    alt={book.title}
-                    className="w-full h-40 object-contain rounded"
-                  />
-                ) : (
-                  <div className="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                    No Image Available
-                  </div>
-                )}
+            {isOverdue && (
+              <span className="text-red-600 text-sm font-medium">Overdue</span>
+            )}
+            {!isOverdue && dueIn3Days && (
+              <span className="text-yellow-600 text-sm font-medium">
+                Due Soon
+              </span>
+            )}
 
-                <h3 className="text-lg font-medium text-[#1b365d] flex items-center gap-2">
-                  <FaBook /> {book.title}
-                </h3>
+            {book.returned_date ? (
+              <span className="text-sm text-gray-500 italic">Returned</span>
+            ) : (
+              <div className="flex justify-center gap-2 mt-2 flex-wrap">
+                <button
+                  onClick={() => handleRenewRequest(book.borrow_id, user.id)}
+                  className={`px-3 mt-auto py-1 text-sm rounded transition shadow-sm flex-1 ${
+                    book.renewal_requested || isOverdue
+                      ? "bg-gray-200 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
+                      : "bg-[#5F97CD] hover:bg-[#3a7ce1] text-white"
+                  }`}
+                  disabled={book.renewal_requested || isOverdue}
+                >
+                  {book.renewal_requested
+                    ? "Renewal Requested"
+                    : "Request Renewal"}
+                </button>
 
-                <p className="text-sm text-gray-700">Author: {book.author}</p>
-                <p className="text-sm text-gray-700">
-                  Issued On:{" "}
-                  {new Date(book.borrowed_date).toLocaleDateString()}
-                </p>
-
-                <div className="flex items-center gap-2 text-sm">
-                  <FaClock />
-                  <span>Due Date: {dueDate.toLocaleDateString()}</span>
-                </div>
-
-                {isOverdue && (
-                  <span className="text-red-600 text-sm font-medium">
-                    Overdue
-                  </span>
-                )}
-                {!isOverdue && dueIn3Days && (
-                  <span className="text-yellow-600 text-sm font-medium">
-                    Due Soon
-                  </span>
-                )}
-
-                {book.returned_date ? (
-                  <span className="text-sm text-gray-500 italic">Returned</span>
-                ) : (
-                  <div className="flex justify-center gap-2 mt-2 flex-wrap">
-  
-  <button
-    onClick={() => handleRenewRequest(book.borrow_id, user.id)}
-    className={`px-3 mt-auto py-1 text-sm rounded transition shadow-sm flex-1 ${
-      book.renewal_requested || isOverdue
-        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-        : "bg-[#5F97CD] hover:bg-[#3a7ce1] text-white"
-    }`}
-    disabled={book.renewal_requested || isOverdue}
-  >
-    {book.renewal_requested ? "Renewal Requested" : "Request Renewal"}
-  </button>
-
-  <button
-    onClick={() => handleReturn(book.borrow_id)}
-    className="px-3 mt-auto py-1 text-sm rounded transition shadow-sm flex-1 bg-[#A8C7F0] hover:bg-[#8BB6E8] text-[#1b365d]"
-  >
-    Return Book
-  </button>
-  
-</div>
-
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
-
-      {confirmModal.visible && (
-  <ConfirmModal
-    message={confirmModal.message}
-    onConfirm={confirmModal.onConfirm}
-    onCancel={() => setConfirmModal({ visible: false, message: "", onConfirm: () => {} })}
-  />
-)}
+                <button
+                  onClick={() => handleReturn(book.borrow_id)}
+                  className="px-3 mt-auto py-1 text-sm rounded transition shadow-sm flex-1 bg-[#A8C7F0] hover:bg-[#8BB6E8] text-[#1b365d] dark:text-[#1b365d]"
+                >
+                  Return Book
+                </button>
+              </div>
+            )}
+          </motion.div>
+        );
+      })}
     </div>
-    
+  )}
 
+  {confirmModal.visible && (
+    <ConfirmModal
+      message={confirmModal.message}
+      onConfirm={confirmModal.onConfirm}
+      onCancel={() =>
+        setConfirmModal({
+          visible: false,
+          message: "",
+          onConfirm: () => {},
+        })
+      }
+    />
+  )}
+</div>
+</>):(<><div className="max-w-6xl p-6 space-y-6">
+        <h2 className="text-3xl font-bold text-[#1b365d]">My Issued Books</h2>
+
+        <div className="w-full p-4 flex flex-wrap items-center gap-4 justify-between">
+          <div className="text-gray-800 font-medium text-base">
+            Total Issued: {issuedBooks.length} | Overdue:{" "}
+            <span
+              className={overdueCount > 0 ? "text-red-500" : "text-black-500"}
+            >
+              {overdueCount}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-3 items-center">
+            <div className="relative">
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by title or author"
+                className="pl-9 pr-4 py-2 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white placeholder-gray-400 w-48 md:w-60"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="px-3 py-2 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 bg-white text-gray-700"
+            >
+              <option value="all">All Books</option>
+              <option value="overdue">Overdue Only</option>
+              <option value="dueSoon">Due in 3 Days</option>
+            </select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="p-4 w-72 mx-auto rounded-lg border border-gray-200 bg-white shadow-md animate-pulse flex flex-col gap-3"
+              >
+                <div className="w-full h-40 bg-gray-200 rounded" />
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-3 bg-gray-200 rounded w-2/3" />
+                <div className="flex justify-center gap-2 mt-4">
+                  <div className="h-8 bg-gray-200 rounded w-24" />
+                  <div className="h-8 bg-gray-200 rounded w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredBooks.length === 0 ? (
+          <p className="text-gray-600 mt-4">No books found.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">
+            {filteredBooks.map((book) => {
+              const dueDate = new Date(book.due_date);
+              const isOverdue = dueDate < today;
+              const dueIn3Days =
+                dueDate - today <= 3 * 24 * 60 * 60 * 1000 && dueDate >= today;
+
+              return (
+                <motion.div
+                  key={book.borrow_id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-4 w-80 rounded-lg border border-gray-200 bg-white shadow-md flex flex-col gap-3 hover:shadow-lg transition"
+                >
+                  {book.image ? (
+                    <img
+                      src={book.image}
+                      alt={book.title}
+                      className="w-full h-40 object-contain rounded"
+                    />
+                  ) : (
+                    <div className="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+                      No Image Available
+                    </div>
+                  )}
+
+                  <h3 className="text-lg font-medium text-[#1b365d] flex items-center gap-2">
+                    <FaBook /> {book.title}
+                  </h3>
+
+                  <p className="text-sm text-gray-700">Author: {book.author}</p>
+                  <p className="text-sm text-gray-700">
+                    Issued On:{" "}
+                    {new Date(book.borrowed_date).toLocaleDateString()}
+                  </p>
+
+                  <div className="flex items-center gap-2 text-sm">
+                    <FaClock />
+                    <span>Due Date: {dueDate.toLocaleDateString()}</span>
+                  </div>
+
+                  {isOverdue && (
+                    <span className="text-red-600 text-sm font-medium">
+                      Overdue
+                    </span>
+                  )}
+                  {!isOverdue && dueIn3Days && (
+                    <span className="text-yellow-600 text-sm font-medium">
+                      Due Soon
+                    </span>
+                  )}
+
+                  {book.returned_date ? (
+                    <span className="text-sm text-gray-500 italic">
+                      Returned
+                    </span>
+                  ) : (
+                    <div className="flex justify-center gap-2 mt-2 flex-wrap">
+                      <button
+                        onClick={() =>
+                          handleRenewRequest(book.borrow_id, user.id)
+                        }
+                        className={`px-3 mt-auto py-1 text-sm rounded transition shadow-sm flex-1 ${
+                          book.renewal_requested || isOverdue
+                            ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                            : "bg-[#5F97CD] hover:bg-[#3a7ce1] text-white"
+                        }`}
+                        disabled={book.renewal_requested || isOverdue}
+                      >
+                        {book.renewal_requested
+                          ? "Renewal Requested"
+                          : "Request Renewal"}
+                      </button>
+
+                      <button
+                        onClick={() => handleReturn(book.borrow_id)}
+                        className="px-3 mt-auto py-1 text-sm rounded transition shadow-sm flex-1 bg-[#A8C7F0] hover:bg-[#8BB6E8] text-[#1b365d]"
+                      >
+                        Return Book
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+
+        {confirmModal.visible && (
+          <ConfirmModal
+            message={confirmModal.message}
+            onConfirm={confirmModal.onConfirm}
+            onCancel={() =>
+              setConfirmModal({
+                visible: false,
+                message: "",
+                onConfirm: () => {},
+              })
+            }
+          />
+        )}
+      </div></>)}
     </>
   );
 }

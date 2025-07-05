@@ -44,7 +44,7 @@ router.put('/update-password/:id', async (req, res) => {
 
         
       // Log Activity
-      logActivity(userId, "Updated account password");
+      logActivity(studentId, "Updated account password");
         
         return res.json({ message: "Password updated successfully" });
       }

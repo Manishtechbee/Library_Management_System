@@ -2,16 +2,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaEnvelope, FaPhone, FaComments, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-export default function Support() {
+export default function Support({darkMode}) {
   const [openFAQ, setOpenFAQ] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser?.dark_mode) {
-      setDarkMode(true);
-    }
-  }, []);
 
   const faqs = [
     {

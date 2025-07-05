@@ -6,7 +6,7 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export default function Fines() {
+export default function Fines({darkMode}) {
   const [activeTab, setActiveTab] = useState("unpaid");
   const [search, setSearch] = useState("");
   const [unpaidFines, setUnpaidFines] = useState([]);
@@ -108,7 +108,188 @@ const exportPDF = () => {
 
 
   return (
-    <div className="space-y-8 p-6">
+    <>
+    {darkMode?(
+  <div className="space-y-8 p-6">
+  <div>
+    <h2 className="text-3xl md:text-4xl font-bold text-[#1b365d] dark:text-white mb-2">
+      Fines
+    </h2>
+  </div>
+
+  {/* Summary Cards */}
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.4 }}
+    className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+  >
+    <div className="bg-white dark:bg-[#2F3B53] shadow rounded-xl p-4 flex items-center gap-4">
+      <FaRupeeSign className="text-red-500 text-2xl" />
+      <div>
+        <p className="text-sm text-gray-500 dark:text-gray-300">Total Unpaid Fines</p>
+        <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">₹{totalUnpaid}</p>
+      </div>
+    </div>
+    <div className="bg-white dark:bg-[#2F3B53] shadow rounded-xl p-4 flex items-center gap-4">
+      <FaRupeeSign className="text-green-500 text-2xl" />
+      <div>
+        <p className="text-sm text-gray-500 dark:text-gray-300">Total Paid Fines</p>
+        <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">₹{totalPaid}</p>
+      </div>
+    </div>
+    <div className="bg-white dark:bg-[#2F3B53] shadow rounded-xl p-4 flex items-center gap-4">
+      <FaClock className="text-yellow-500 text-2xl" />
+      <div>
+        <p className="text-sm text-gray-500 dark:text-gray-300">Overdue Books</p>
+        <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">{unpaidFines.length}</p>
+      </div>
+    </div>
+  </motion.div>
+
+  {/* Tabs */}
+  <div className="flex gap-4 flex-wrap">
+    
+    {/* Search & Export */}
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="relative w-full sm:w-72">
+        <FaSearch className="absolute top-3 left-3 text-gray-400 dark:text-gray-300" />
+        <input
+          type="text"
+          placeholder="Search by book title..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-transparent text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm"
+        />
+      </div>
+    </div>
+
+    <button
+      onClick={() => setActiveTab("unpaid")}
+      className={`px-4 py-2 rounded-xl transition ${
+        activeTab === "unpaid"
+          ? "bg-blue-500 text-white shadow"
+          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+      }`}
+    >
+      Unpaid Fines
+    </button>
+    <button
+      onClick={() => setActiveTab("history")}
+      className={`px-4 py-2 rounded-xl transition ${
+        activeTab === "history"
+          ? "bg-blue-500 text-white shadow"
+          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+      }`}
+    >
+      Payment History
+    </button>
+
+    <div className="ml-auto mr-3">
+      {activeTab === "history" && (
+        <button
+          onClick={exportPDF}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full shadow hover:bg-green-700 transition"
+        >
+          <FaFilePdf /> Export to PDF
+        </button>
+      )}
+    </div>
+  </div>
+
+  {/* Tab Content */}
+  <div className="bg-white dark:bg-[#2F3B53] shadow rounded-xl p-4 overflow-x-auto">
+    {loading ? (
+      <p className="text-gray-600 dark:text-gray-300">Loading fines...</p>
+    ) : activeTab === "unpaid" ? (
+      filteredUnpaid.length === 0 ? (
+        <p className="text-gray-500 dark:text-gray-300">No unpaid fines found.</p>
+      ) : (
+        <>
+          <table className="w-full text-sm text-left border-collapse min-w-[500px]">
+            <thead>
+              <tr className="text-gray-600 dark:text-gray-300 border-b dark:border-gray-600">
+                <th className="py-3">Book Title</th>
+                <th>Due Date</th>
+                <th>Fine Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUnpaid.map((fine, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-600 transition border-b dark:border-gray-600 last:border-none">
+                  <td className="py-3 text-gray-800 dark:text-gray-100">{fine.title}</td>
+                  <td className="text-gray-800 dark:text-gray-100">{fine.due_date}</td>
+                  <td className="text-gray-800 dark:text-gray-100">₹{fine.amount}</td>
+                  <td><span className="text-red-500 font-medium">Unpaid</span></td>
+                  <td>
+                    <button
+                      onClick={() => handlePay(fine)}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition"
+                    >
+                      Pay Now
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {totalUnpaid > 0 && (
+            <div className="mt-6 flex justify-between items-center">
+              <span className="font-medium text-gray-800 dark:text-gray-100">Total Due: ₹{totalUnpaid}</span>
+              <button
+                onClick={handlePayAll}
+                className="px-4 py-1 mr-20 bg-green-600 text-white rounded shadow hover:bg-green-700 transition"
+              >
+                Pay All
+              </button>
+            </div>
+          )}
+        </>
+      )
+    ) : filteredPaid.length === 0 ? (
+      <p className="text-gray-500 dark:text-gray-300">No payment history found.</p>
+    ) : (
+      <table className="w-full text-sm text-left border-collapse min-w-[500px]">
+        <thead>
+          <tr className="text-gray-600 dark:text-gray-300 border-b dark:border-gray-600">
+            <th className="py-3">Book Title</th>
+            <th>Paid On</th>
+            <th>Amount</th>
+            <th>Transaction ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredPaid.map((fine, idx) => (
+            <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-600 transition border-b dark:border-gray-600 last:border-none">
+              <td className="py-3 text-gray-800 dark:text-gray-100">{fine.title}</td>
+              <td className="text-gray-800 dark:text-gray-100">{fine.paid_on}</td>
+              <td className="text-gray-800 dark:text-gray-100">₹{fine.amount}</td>
+              <td className="flex items-center gap-2 text-gray-800 dark:text-gray-100">
+                <FaCheckCircle className="text-green-500" /> {fine.txn_id}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+  {/* Helpful Info */}
+  <div className="bg-white dark:bg-[#2F3B53] shadow rounded-xl p-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
+    <p>💡 Fine Policy: ₹10 per day overdue after due date.</p>
+    <p>
+      💬 For disputes,{" "}
+      <a href="/dashboard/student/support" className="text-blue-500 hover:underline">
+        contact support
+      </a>
+      .
+    </p>
+  </div>
+</div>
+):(<div className="space-y-8 p-6">
       <div>
         <h2 className="text-3xl md:text-4xl font-bold text-[#1b365d] mb-2">
       Fines
@@ -287,12 +468,13 @@ const exportPDF = () => {
         <p>💡 Fine Policy: ₹10 per day overdue after due date.</p>
         <p>
           💬 For disputes,{" "}
-          <a href="/dashboard/faculty/support" className="text-blue-500 hover:underline">
+          <a href="/dashboard/student/support" className="text-blue-500 hover:underline">
             contact support
           </a>
           .
         </p>
       </div>
-    </div>
+    </div>)}
+    </>
   );
 }

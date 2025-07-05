@@ -81,6 +81,9 @@ import Recomm from "./pages/faculty/Recommendations";
 
 import StudentRef from "./pages/faculty/stuentRefer";
 
+import UserLib from "./pages/librarian/User";
+
+
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -129,36 +132,36 @@ useEffect(() => {
         path="/dashboard/admin"
         element={
           <CombinedRoute allowedRoles={["admin"]}>
-            <AdminDashboard chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <AdminDashboard chatOpen={chatOpen} setChatOpen={setChatOpen} darkMode={darkMode} setDarkMode={toggleDarkMode} />
           </CombinedRoute>
         }
 
       >
-        <Route index element={<DashH />} />
+        <Route index element={<DashH darkMode={darkMode} />} />
         
-      <Route path="catalog" element={<BooksInv />} />
+      <Route path="catalog" element={<BooksInv darkMode={darkMode}/>} />
        {/* Books */}
-            <Route path="/dashboard/admin/books" element={<AllBooks />} />
-            <Route path="/dashboard/admin/add-book" element={<AddBook />} />
-            <Route path="/dashboard/admin/delete-book" element={<DeleteBook />} />
+            <Route path="/dashboard/admin/books" element={<AllBooks darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/add-book" element={<AddBook darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/delete-book" element={<DeleteBook darkMode={darkMode}/>} />
 
             {/* Users */}
-            <Route path="/dashboard/admin/users" element={<AllUsers />} />
-            <Route path="/dashboard/admin/librarians" element={<ManageLibrarians />} />
+            <Route path="/dashboard/admin/users" element={<AllUsers darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/librarians" element={<ManageLibrarians darkMode={darkMode}/>} />
 
             {/* Issue & Return */}
-            <Route path="/dashboard/admin/issue-requests" element={<IssueRequests />} />
-            <Route path="/dashboard/admin/overdue" element={<OverdueFines />} />
+            <Route path="/dashboard/admin/issue-requests" element={<IssueRequests darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/overdue" element={<OverdueFines darkMode={darkMode}/>} />
 
             {/* Reports */}
-            <Route path="/dashboard/admin/reports" element={<ReportsLogs />} />
+            <Route path="/dashboard/admin/reports" element={<ReportsLogs darkMode={darkMode}/>} />
 
             {/* System */}
-            <Route path="/dashboard/admin/export" element={<ExportData />} />
-            <Route path="/dashboard/admin/backup" element={<BackupControl />} />
-            <Route path="/dashboard/admin/no-dues" element={<NoDuesPanel />} />
-            <Route path="/dashboard/admin/complaints" element={<Complaints />} />
-            <Route path="/dashboard/admin/settings" element={<AdminSettings />} />
+            <Route path="/dashboard/admin/export" element={<ExportData darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/backup" element={<BackupControl darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/no-dues" element={<NoDuesPanel darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/complaints" element={<Complaints darkMode={darkMode}/>} />
+            <Route path="/dashboard/admin/settings" element={<AdminSettings darkMode={darkMode} toggleDarkMode={toggleDarkMode}/>} />
       </Route>
 
 
@@ -192,22 +195,22 @@ useEffect(() => {
         path="/dashboard/faculty"
         element={
           <CombinedRoute allowedRoles={["faculty"]}>
-            <FacultyDashboard chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <FacultyDashboard chatOpen={chatOpen} setChatOpen={setChatOpen} darkMode={darkMode} setDarkMode={toggleDarkMode} />
           </CombinedRoute>
         }
       >
-        <Route index element={<DashHome />} />
+        <Route index element={<DashHome darkMode={darkMode} setDarkMode={toggleDarkMode} />} />
         
-  <Route path="e-resources" element={<Eres/>} />
-      <Route path="catalog" element={<BCatalog/>} />
+  <Route path="e-resources" element={<Eres darkMode={darkMode} />} />
+      <Route path="catalog" element={<BCatalog darkMode={darkMode} />} />
   <Route path="settings" element={<Sett darkMode={darkMode} toggleDarkMode={toggleDarkMode}/>} />
-  <Route path="support" element={<Supp />} />
-  <Route path='MyBooks' element={<MyB/>}/>
-  <Route path='profile' element={<Prof/>}/>
-  <Route path='fines' element={<Fin/>}/>
-  <Route path='recommendations' element={<Recomm/>}/>
+  <Route path="support" element={<Supp darkMode={darkMode} />} />
+  <Route path='MyBooks' element={<MyB darkMode={darkMode} />}/>
+  <Route path='profile' element={<Prof darkMode={darkMode} />}/>
+  <Route path='fines' element={<Fin darkMode={darkMode} />}/>
+  <Route path='recommendations' element={<Recomm darkMode={darkMode} />}/>
   
-  <Route path='refer' element={<StudentRef/>}/>
+  <Route path='refer' element={<StudentRef darkMode={darkMode} />}/>
   
       </Route>
 
@@ -217,16 +220,18 @@ useEffect(() => {
         element={
           <CombinedRoute allowedRoles={["librarian"]}>
             
-            <LibrarianDashboard chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <LibrarianDashboard chatOpen={chatOpen} setChatOpen={setChatOpen} darkMode={darkMode} setDarkMode={toggleDarkMode} />
           </CombinedRoute>
         }
       >
-        <Route index element={<DashHomeLib/>} />
-        <Route path='catalog' element={<BooksCat/>}/>
-        <Route path='books' element={<AllBooksLib/>}/>
-        <Route path="issue-requests" element={<IssueRequestsLib />} />
-        <Route path="settings" element={<LibrarianSettings />} />
-        <Route path="reports" element={<Reports />} />
+        <Route index element={<DashHomeLib  darkMode={darkMode}/>} />
+        <Route path='catalog' element={<BooksCat darkMode={darkMode}/>}/>
+        <Route path='books' element={<AllBooksLib darkMode={darkMode}/>}/>
+        <Route path="issue-requests" element={<IssueRequestsLib darkMode={darkMode} />} />
+        <Route path="settings" element={<LibrarianSettings darkMode={darkMode}  toggleDarkMode={toggleDarkMode}/>} />
+        <Route path="reports" element={<Reports darkMode={darkMode} />} />
+        
+        <Route path="users" element={<UserLib darkMode={darkMode} />} />
       </Route>
 
 

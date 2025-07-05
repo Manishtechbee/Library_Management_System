@@ -4,7 +4,7 @@ import { FaSearch, FaTrash, FaCheck } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 
-export default function ComplaintsManagement() {
+export default function ComplaintsManagement({darkMode}) {
   const [complaints, setComplaints] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -48,7 +48,108 @@ export default function ComplaintsManagement() {
   });
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
+    <>
+    {darkMode?(<div className="w-full max-w-6xl mx-auto p-6 space-y-6">
+  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+    <h2 className="text-3xl font-bold text-[#1b365d] dark:text-[#dceafb] mb-2">Complaints Management</h2>
+    <p className="text-gray-600 dark:text-gray-300">View, filter, and manage user complaints.</p>
+  </motion.div>
+
+  <div className="flex flex-wrap gap-4 items-center">
+    <div className="flex items-center gap-3 bg-white dark:bg-gray-800 shadow p-3 rounded-lg w-full max-w-md">
+      <FaSearch className="text-gray-400 dark:text-gray-300" />
+      <input
+        type="text"
+        placeholder="Search complaints"
+        className="flex-1 outline-none bg-transparent text-gray-800 dark:text-gray-100"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+
+    <select
+      value={filterStatus}
+      onChange={(e) => setFilterStatus(e.target.value)}
+      className="p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow rounded-lg border dark:border-gray-600"
+    >
+      <option value="">All Status</option>
+      <option value="Pending">Pending</option>
+      <option value="Resolved">Resolved</option>
+    </select>
+  </div>
+
+  <div className="overflow-x-auto">
+    <table className="min-w-full bg-white dark:bg-gray-800 shadow rounded-lg text-sm">
+      <thead>
+        <tr className="bg-[#f0f4fa] dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+          <th className="p-3">Subject</th>
+          <th className="p-3">Description</th>
+          <th className="p-3">User</th>
+          <th className="p-3">Date</th>
+          <th className="p-3">Status</th>
+          <th className="p-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredComplaints.map((c, index) => (
+          <tr
+            key={c.id}
+            className={`${
+              index % 2 === 0
+                ? "bg-white dark:bg-gray-800"
+                : "bg-[#f9fbfd] dark:bg-gray-700"
+            } hover:bg-[#eef3fa] dark:hover:bg-gray-600 transition`}
+          >
+            <td className="p-3 font-medium text-[#1b365d] dark:text-[#dceafb]">{c.subject}</td>
+            <td className="p-3 text-gray-800 dark:text-gray-100">{c.description}</td>
+            <td className="p-3 text-gray-800 dark:text-gray-100">{c.user_name}</td>
+            <td className="p-3 text-gray-800 dark:text-gray-100">
+              {new Date(c.created_at).toLocaleDateString()}
+            </td>
+            <td className="p-3">
+              <span
+                className={`px-2 py-1 rounded text-sm ${
+                  c.status === "Resolved"
+                    ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                    : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                }`}
+              >
+                {c.status}
+              </span>
+            </td>
+            <td className="p-3 flex gap-2">
+              <button
+                onClick={() => markAsResolved(c.id)}
+                className={`px-2 py-1 rounded text-sm flex items-center gap-1 ${
+                  c.status === "Resolved"
+                    ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 cursor-not-allowed"
+                    : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
+                }`}
+                disabled={c.status === "Resolved"}
+              >
+                <FaCheck /> {c.status === "Resolved" ? "Resolved" : "Resolve"}
+              </button>
+              <button
+                onClick={() => handleDelete(c.id)}
+                className="px-2 py-1 bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800 rounded text-sm flex items-center gap-1"
+              >
+                <FaTrash /> Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+        {filteredComplaints.length === 0 && (
+          <tr>
+            <td colSpan="6" className="p-4 text-center text-gray-500 dark:text-gray-300">
+              No complaints found.
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
+):(<div className="w-full max-w-6xl mx-auto p-6 space-y-6">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h2 className="text-3xl font-bold text-[#1b365d] mb-2">Complaints Management</h2>
         <p className="text-gray-600">View, filter, and manage user complaints.</p>
@@ -136,6 +237,7 @@ export default function ComplaintsManagement() {
           </tbody>
         </table>
       </div>
-    </div>
+    </div>)}
+    </>
   );
 }

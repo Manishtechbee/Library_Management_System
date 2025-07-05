@@ -583,3 +583,7 @@ app.use('/api/faculty/', facultyRoutes);
 
 const ReturnRoutes = require('./routes/ReturnRequests');
 app.use('/api', ReturnRoutes);
+
+
+const userDetailsRoutes=require("./routes/users");
+app.use('/api/user/data', userDetailsRoutes);

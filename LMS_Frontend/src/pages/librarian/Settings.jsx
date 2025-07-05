@@ -1,31 +1,26 @@
 import { useState, useEffect } from "react";
-import { FaCamera, FaTrash, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaLock, FaCogs, FaCamera } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import axios from "axios";
 
-export default function StudentSettings() {
-  const [name, setName] = useState("Manish Kumar");
-  const [email, setEmail] = useState("manish@example.com");
-  const [phone, setPhone] = useState("9876543210");
-  const [address, setAddress] = useState("Punjab, India");
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [appNotifications, setAppNotifications] = useState(true);
-  const [theme, setTheme] = useState("system");
+export default function AdminSettings({ darkMode, toggleDarkMode }) {
+  const [activeTab, setActiveTab] = useState("profile");
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [password, setPassword] = useState({
-  old: "",
-  new: "",
-  confirm: "",
-});
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Admin&background=cccccc&color=000&size=128");
 
-  const [newEmail, setNewEmail] = useState("");
-  const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Manish+Kumar&background=cccccc&color=000&size=128");
+  const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
+  const [loading, setLoading] = useState(false);
+
+  const [notifications, setNotifications] = useState(true);
 
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
- useEffect(() => {
+useEffect(() => {
   if (storedUser?.id) {
     fetch(`http://localhost:5000/api/student/${storedUser.id}`)
       .then(res => res.json())
@@ -66,371 +61,268 @@ export default function StudentSettings() {
         .then(res => res.json())
         .then(data => {
           setAvatar(`http://localhost:5000${data.imagePath}`);
-          alert("Profile Image Updated!");
+          toast.success("Profile Image Updated!");
         })
         .catch(err => console.error(err));
     }
   };
 
   const handleSave = () => {
-    fetch(`http://localhost:5000/api/student/${storedUser.id}`, {
+  fetch(`http://localhost:5000/api/student/${storedUser.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, phone, address })
+  })
+    .then(res => res.json())
+    .then(data => {
+      toast.success("Profile Updated Successfully!");
+
+      // Update name in localStorage
+      const updatedUser = { ...storedUser, name };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    })
+    .catch(err => console.error(err));
+};
+
+
+  const handleProfileUpdate = () => {
+    setLoading(true);
+    axios.put(`http://localhost:5000/api/admin/profile/${storedUser.id}`, {
+      name, phone, address
+    })
+      .then(() => {
+        toast.success("Profile updated successfully");
+        const updatedUser = { ...storedUser, name };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      })
+      .catch(() => toast.error("Failed to update profile"))
+      .finally(() => setLoading(false));
+  };
+
+  const handlePasswordChange = async () => {
+  if (passwords.new !== passwords.confirm) {
+    toast.error("Passwords do not match");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const res = await fetch(`http://localhost:5000/api/student/update-password/${user.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, address })
-    })
-      .then(res => res.json())
-      .then(data => alert("Profile Updated Successfully!"))
-      .catch(err => console.error(err));
+      body: JSON.stringify({
+        oldPassword: passwords.current,
+        newPassword: passwords.new,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast.success("Password updated successfully!");
+      setPasswords({ current: "", new: "", confirm: "" });
+    } else {
+      toast.error(data.message || "Incorrect current password.");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("An error occurred while updating the password.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const handleToggleNotifications = () => {
+    const updated = !notifications;
+    setNotifications(updated);
+    {/*axios.put(`http://localhost:5000/api/admin/settings/${storedUser.id}`, { notifications: updated })
+      .then(() => {
+        toast.success(`Notifications ${updated ? "enabled" : "disabled"}`);
+      })
+      .catch(() => toast.error("Failed to update notifications"));*/}
   };
 
   return (
-    <div className="min-h-screen bg-white flex justify-center items-start p-5">
-      <div className="w-full max-w-6xl space-y-12">
-
-        <h1 className="text-2xl font-bold text-gray-800">Student Settings</h1>
-
-        {/* Profile Section */}
-        <div className="space-y-6 pb-8 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-700">Profile Information</h2>
-          <div className="grid grid-cols-3 gap-8 items-start">
-            {/* Avatar */}
-            <div className="flex flex-col items-center">
-              <div className="relative">
-                <img
-                  src={avatar}
-                  alt="Avatar"
-                  className="w-35 h-35 rounded-full object-cover"
-                />
-                <button
-                  className="absolute bottom-0 right-0 p-2.5 bg-gray-700 text-white rounded-full text-s"
-                  onClick={() => document.getElementById("avatarInput").click()}
-                >
-                  <FaCamera />
-                </button>
-                <input
-                  type="file"
-                  id="avatarInput"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </div>
-            </div>
-
-            {/* Profile Details */}
-            <div className="col-span-2 grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Name</label>
-                <input
-                  className="w-full bg-gray-100 rounded p-1 focus:outline-none"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Email</label>
-                <input
-                  className="w-full  rounded p-1 bg-gray-100"
-                  value={email}
-                  disabled
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1 ">Phone Number</label>
-                <input
-                  className="w-full p-1 bg-gray-100 rounded focus:outline-none"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Address</label>
-                <input
-                  className="w-full bg-gray-100 rounded p-1 focus:outline-none"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-
-
-              
-    {/*<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label className="text-sm text-gray-600">Name</label>
-        <input
-          className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          type="text"
-        />
+    <div className={`flex flex-col md:flex-row max-w-5xl mx-auto p-6 gap-6 rounded-2xl ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
+      
+      {/* Sidebar */}
+      <div className="w-full md:w-1/4 space-y-2">
+        {[
+          { label: "Profile", icon: <FaUser />, key: "profile" },
+          { label: "Security", icon: <FaLock />, key: "security" },
+          { label: "Preferences", icon: <FaCogs />, key: "preferences" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex items-center gap-2 w-full px-4 py-2 rounded-lg ${
+              activeTab === tab.key
+                ? darkMode
+                  ? "bg-blue-700 text-white"
+                  : "bg-[#1b365d] text-white"
+                : darkMode
+                  ? "bg-gray-700 text-gray-200"
+                  : "bg-gray-100 text-gray-700"
+            } hover:opacity-90 transition`}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
       </div>
-      <div>
-        <label className="text-sm text-gray-600">Phone Number</label>
-        <input
-          className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          type="text"
-        />
-      </div>
-      <div className="sm:col-span-2">
-        <label className="text-sm text-gray-600">Address</label>
-        <input
-          className="w-full p-2 mt-1 bg-gray-100 rounded text-sm"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          type="text"
-        />
-      </div>*/}
 
+      {/* Content */}
+      <div className={`flex-1 rounded-lg shadow p-6 relative ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
+        <AnimatePresence mode="wait">
 
-
-
-
-
-
-
-
-
-
-            </div>
-          </div>
-          <div className="flex justify-end mt-4">
-            <button onClick={handleSave} className="px-6 py-2 bg-blue-600 text-white rounded">
-              Save Changes
-            </button>
-          </div>
-        </div>
-
-        {/* Account Settings */}
-        <div className="space-y-4 pb-8 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-700">Account Settings</h2>
-          <div className="flex flex-wrap gap-4">
-            <button onClick={() => setShowPasswordModal(true)} className="px-4 py-2 bg-gray-800 text-white rounded">Change Password</button>
-            <button onClick={() => setShowEmailModal(true)} className="px-4 py-2 bg-gray-800 text-white rounded">Update Email</button>
-            <button onClick={() => alert("Manage devices functionality here")} className="px-4 py-2 bg-gray-800 text-white rounded">Manage Login Devices</button>
-          </div>
-        </div>
-
-        {/* Notifications */}
-        <div className="space-y-4 pb-8 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-700">Notifications</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={emailNotifications}
-                onChange={() => setEmailNotifications(!emailNotifications)}
-              />
-              <span className="text-gray-700">Email Notifications</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={appNotifications}
-                onChange={() => setAppNotifications(!appNotifications)}
-              />
-              <span className="text-gray-700">App Notifications</span>
-            </div>
-          </div>
-        </div>
-
-        {/* App Preferences */}
-        <div className="space-y-4 pb-8 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-700">App Preferences</h2>
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">Theme</label>
-            <select
-              className="border-b p-1 focus:outline-none"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
+          {activeTab === "profile" && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
             >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System Default</option>
-            </select>
-          </div>
-        </div>
+              <h2 className="text-xl font-semibold mb-4">Profile Settings</h2>
 
-        {/* Danger Zone */}
-        <div className="flex justify-between items-center p-4 bg-red-50 rounded">
-          <span className="text-red-600 font-medium">Delete Account</span>
-          <button onClick={() => setShowDeleteConfirm(true)} className="px-4 py-1 bg-red-600 text-white rounded flex items-center gap-2">
-            <FaTrash />
-            Delete
-          </button>
-        </div>
+              <div className="flex flex-col items-center mb-4">
+                <div className="relative">
+                  <img src={avatar} alt="Avatar" className="w-32 h-32 rounded-full border-2 border-gray-400 object-cover" />
+                  <button
+                    onClick={() => document.getElementById("avatarInput").click()}
+                    className="absolute bottom-0 right-0 p-2 bg-gray-700 text-white rounded-full hover:bg-gray-500 transition"
+                  >
+                    <FaCamera />
+                  </button>
+                  <input
+                    type="file"
+                    id="avatarInput"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </div>
+              </div>
 
-        {/* Logout */}
-        <div>
-          <button onClick={() => setShowLogoutConfirm(true)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded">
-            <FaSignOutAlt />
-            Logout
-          </button>
-        </div>
+              <input
+                type="text"
+                className={`border px-3 py-2 rounded w-full ${darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900"}`}
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                type="email"
+                className={`border px-3 py-2 rounded w-full ${darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900"}`}
+                placeholder="Email"
+                value={email}
+                disabled
+              />
+              <input
+                type="text"
+                className={`border px-3 py-2 rounded w-full ${darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900"}`}
+                placeholder="Phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+              <input
+                type="text"
+                className={`border px-3 py-2 rounded w-full ${darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900"}`}
+                placeholder="Address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800"
+                disabled={loading}
+              >
+                Save Changes
+              </button>
+            </motion.div>
+          )}
+
+          {activeTab === "security" && (
+            <motion.div
+              key="security"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              <h2 className="text-xl font-semibold mb-2">Change Password</h2>
+              <input
+                type="password"
+                className={`border px-3 py-2 rounded w-full ${darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900"}`}
+                placeholder="Current Password"
+                value={passwords.current}
+                onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+              />
+              <input
+                type="password"
+                className={`border px-3 py-2 rounded w-full ${darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900"}`}
+                placeholder="New Password"
+                value={passwords.new}
+                onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+              />
+              <input
+                type="password"
+                className={`border px-3 py-2 rounded w-full ${darkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900"}`}
+                placeholder="Confirm New Password"
+                value={passwords.confirm}
+                onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+              />
+              <button
+                onClick={handlePasswordChange}
+                className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800"
+                disabled={loading}
+              >
+                Update Password
+              </button>
+            </motion.div>
+          )}
+
+          {activeTab === "preferences" && (
+            <motion.div
+              key="preferences"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <h2 className="text-xl font-semibold mb-2">Preferences</h2>
+
+              <div className={`flex items-center justify-between border px-4 py-3 rounded ${darkMode ? "border-gray-600" : "border-gray-300"}`}>
+                <span>Dark Mode</span>
+                <button
+                  onClick={() => toggleDarkMode(!darkMode)}
+                  className={`px-4 py-2 rounded ${darkMode ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                >
+                  {darkMode ? "Enabled" : "Disabled"}
+                </button>
+              </div>
+
+              <div className={`flex items-center justify-between border px-4 py-3 rounded ${darkMode ? "border-gray-600" : "border-gray-300"}`}>
+                <span>Notifications</span>
+                <button
+                  onClick={handleToggleNotifications}
+                  className={`px-4 py-2 rounded ${notifications ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                >
+                  {notifications ? "Enabled" : "Disabled"}
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow w-80 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800">Confirm Account Deletion</h2>
-            <p className="text-gray-600">Are you sure you want to delete your account? This cannot be undone.</p>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-1 bg-gray-300 rounded">Cancel</button>
-              <button onClick={() => {
-                setShowDeleteConfirm(false);
-                alert("Account Deleted!");
-              }} className="px-4 py-1 bg-red-600 text-white rounded">Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Logout Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow w-80 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800">Confirm Logout</h2>
-            <p className="text-gray-600">Are you sure you want to logout?</p>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setShowLogoutConfirm(false)} className="px-4 py-1 bg-gray-300 rounded">Cancel</button>
-              <button onClick={() => {
-                setShowLogoutConfirm(false);
-                alert("Logged Out!");
-              }} className="px-4 py-1 bg-gray-800 text-white rounded">Logout</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showPasswordModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white p-6 rounded shadow w-96 space-y-4">
-      <h2 className="text-lg font-semibold text-gray-800">Update Password</h2>
-
-      {/* Old Password */}
-      <input
-        type="password"
-        placeholder="Enter current password"
-        className="w-full border-b p-2 focus:outline-none"
-        value={password.old}
-        onChange={(e) =>
-          setPassword((prev) => ({ ...prev, old: e.target.value }))
-        }
-      />
-
-      {/* New Password */}
-      <input
-        type="password"
-        placeholder="Enter new password"
-        className="w-full border-b p-2 focus:outline-none"
-        value={password.new}
-        onChange={(e) =>
-          setPassword((prev) => ({ ...prev, new: e.target.value }))
-        }
-      />
-
-      {/* Confirm New Password */}
-      <input
-        type="password"
-        placeholder="Confirm new password"
-        className="w-full border-b p-2 focus:outline-none"
-        value={password.confirm}
-        onChange={(e) =>
-          setPassword((prev) => ({ ...prev, confirm: e.target.value }))
-        }
-      />
-
-      <div className="flex justify-end gap-2">
-        <button
-          onClick={() => {
-            setShowPasswordModal(false);
-            setPassword({ old: "", new: "", confirm: "" });
-          }}
-          className="px-4 py-1 bg-gray-300 rounded"
-        >
-          Cancel
-        </button>
-
-        <button
-          onClick={async () => {
-            const { old, new: newPass, confirm } = password;
-
-            if (!old || !newPass || !confirm) {
-              alert("Please fill all fields.");
-              return;
-            }
-            if (newPass.length < 6) {
-              alert("New password must be at least 6 characters.");
-              return;
-            }
-            if (newPass !== confirm) {
-              alert("New password and confirm password do not match.");
-              return;
-            }
-
-            try {
-              const user = JSON.parse(localStorage.getItem("user"));
-
-              const res = await fetch(
-                `http://localhost:5000/api/student/update-password/${user.id}`,
-                {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    oldPassword: old,
-                    newPassword: newPass,
-                  }),
-                }
-              );
-
-              const data = await res.json();
-
-              if (res.ok) {
-                alert("Password Updated Successfully!");
-                setShowPasswordModal(false);
-                setPassword({ old: "", new: "", confirm: "" });
-              } else {
-                alert(data.message || "Incorrect current password.");
-              }
-            } catch (error) {
-              console.error(error);
-              alert("An error occurred while updating password.");
-            }
-          }}
-          className="px-4 py-1 bg-gray-800 text-white rounded"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-      {/* Email Update Modal */}
-      {showEmailModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow w-80 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-800">Update Email</h2>
-            <input
-              type="email"
-              placeholder="Enter new email"
-              className="w-full border-b p-2 focus:outline-none"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setShowEmailModal(false)} className="px-4 py-1 bg-gray-300 rounded">Cancel</button>
-              <button onClick={() => {
-                setShowEmailModal(false);
-                alert("Email Updated!");
-              }} className="px-4 py-1 bg-gray-800 text-white rounded">Save</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

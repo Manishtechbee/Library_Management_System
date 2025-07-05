@@ -1,7 +1,7 @@
 module.exports = {
   backupFolder: "./backups",
-  password: "secureAdminPassword", // Change this
-  dbName: "library_db",
+  password: "123", // Change this
+  dbName: "library",
   dbUser: "root",
-  dbPassword: "your_mysql_password",
+  dbPassword: "12345",
 };

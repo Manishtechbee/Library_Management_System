@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 
 
-export default function BooksCatalog() {
+export default function BooksCatalog({darkMode}) {
   
   const user = JSON.parse(localStorage.getItem("user"));
   const [books, setBooks] = useState([]);
@@ -139,7 +139,185 @@ useEffect(() => {
 
 
   return (
-    <div className="w-full space-y-6">
+    <>
+    {darkMode?(<div className="w-full space-y-6">
+
+  {/* Search and Filter */}
+  <div className="flex flex-wrap gap-4 items-center">
+    <div className="flex items-center gap-3 bg-white dark:bg-gray-700 shadow p-3 rounded-lg w-full max-w-md">
+      <FaSearch className="text-gray-400 dark:text-gray-300" />
+      <input
+        type="text"
+        placeholder="Search by title"
+        className="flex-1 outline-none bg-transparent text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+
+    <select value={availabilityFilter} onChange={(e) => setAvailabilityFilter(e.target.value)} className="p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow rounded-lg border dark:border-gray-600">
+      <option value="all">All</option>
+      <option value="available">Available</option>
+      <option value="not_available">Not Available</option>
+    </select>
+
+    <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow rounded-lg border dark:border-gray-600">
+      <option value="all">All Categories</option>
+      <option value="Programming">Programming</option>
+      <option value="AI">AI</option>
+      <option value="Psychology">Psychology</option>
+    </select>
+  </div>
+
+  {/* Book Grid */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {loading ? (
+      Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="bg-white dark:bg-gray-800 shadow-md p-4 rounded-lg flex flex-col gap-3 animate-pulse">
+          <div className="w-80 mt-3 mx-auto justify-center h-50 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
+          <div className="flex gap-2 mt-4">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+          </div>
+        </div>
+      ))
+    ) : (
+      filteredBooks.slice(0, visibleCount).map(book => (
+        <motion.div
+          key={book.id}
+          className="bg-white dark:bg-gray-700 shadow-md p-4 rounded-lg flex flex-col gap-2 hover:shadow-lg transition cursor-pointer"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={() => setSelectedBook(book)}
+        >
+
+          {book.image && <img src={book.image} alt={book.title} className="w-full h-40 object-contain mb-2" />}
+
+          <div className="flex items-center justify-between">
+            <h4 className="text-lg font-semibold text-[#1b365d] dark:text-blue-300">{book.title}</h4>
+            <FaBook className="text-[#5F97CD]" />
+          </div>
+
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Author: {book.author}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Category: {book.category}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Edition: {book.edition}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Publisher: {book.publisher}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Year: {book.year}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Branch: {book.branch}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Department: {book.department}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Copies: {book.copies}</p>
+
+          <p className={`text-sm font-medium ${book.available ? "text-green-600" : "text-red-500"}`}>
+            {book.available ? "Available" : "Not Available"}
+          </p>
+
+          <div className="mt-auto flex gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (book.available) {
+                  handleIssue(book);
+                } else {
+                  toast.error(`"${book.title}" is currently not available`);
+                }
+              }}
+              className={`flex-1 px-3 py-1 rounded-md text-sm transition shadow-sm ${
+                book.available
+                  ? 'bg-[#5F97CD] hover:bg-[#3a7ce1] text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              Request Issue
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleIssue(book);
+                if (book.ebook_link) {
+                  window.open(book.ebook_link, '_blank', 'noopener noreferrer');
+                } else {
+                  toast.error(`No E-Book available for "${book.title}"`);
+                }
+              }}
+              className={`flex-1 px-3 py-1 rounded-md text-sm transition shadow-sm ${
+                book.ebook_link
+                  ? 'bg-[#A8C7F0] hover:bg-[#8BB6E8] text-[#1b365d] dark:text-blue-900'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              View E-Book
+            </button>
+          </div>
+        </motion.div>
+      ))
+    )}
+  </div>
+
+  {/* Load More Button */}
+  {visibleCount < filteredBooks.length && (
+    <div className="text-center">
+      <button onClick={() => setVisibleCount(visibleCount + 6)} className="px-4 py-2 bg-[#5F97CD] hover:bg-[#3a7ce1] text-white rounded-lg">Load More</button>
+    </div>
+  )}
+
+  {/* Book Description Modal */}
+  {selectedBook && (
+    <>
+      {/* Dark Overlay */}
+      <div
+        className="fixed inset-0 p-0 m-0 bg-gray-900 opacity-40 z-30"
+        onClick={() => setSelectedBook(null)}
+      ></div>
+
+      {/* Description Card */}
+      <div className="fixed inset-0 flex justify-center items-center z-50">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-11/12 max-w-lg relative border border-gray-200 dark:border-gray-700 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          
+          {/* Close Button */}
+          <button
+            onClick={() => setSelectedBook(null)}
+            className="absolute top-3 right-3 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white text-xl"
+          >
+            &times;
+          </button>
+
+          {/* Book Info */}
+          <h2 className="text-2xl font-bold text-[#1b365d] dark:text-blue-300 mb-1">{selectedBook.title}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">by {selectedBook.author}</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-gray-600 dark:text-gray-300 text-sm"><span className="font-medium">Category:</span> {selectedBook.category}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm"><span className="font-medium">Edition:</span> {selectedBook.edition}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm"><span className="font-medium">Publisher:</span> {selectedBook.publisher}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm"><span className="font-medium">Year:</span> {selectedBook.year}</p>
+            </div>
+            <div>
+              <p className="text-gray-600 dark:text-gray-300 text-sm"><span className="font-medium">Available Copies:</span> {selectedBook.copies}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm"><span className="font-medium">Availability:</span> {selectedBook.available ? "Available" : "Not Available"}</p>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mb-4">
+            <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-1">Description</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              {selectedBook.description || "No description available for this book."}
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </>
+  )}
+
+</div>
+):(<div className="w-full space-y-6">
       
 
       <div className="flex flex-wrap gap-4 items-center">
@@ -330,6 +508,7 @@ useEffect(() => {
   </>
 )}
 
-    </div>
+    </div>)}
+    </>
   );
 }

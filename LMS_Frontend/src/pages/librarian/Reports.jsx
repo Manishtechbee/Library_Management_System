@@ -3,7 +3,7 @@ import { FaBook, FaUsers, FaBookmark, FaExclamationTriangle, FaDownload } from "
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function ReportsStatus() {
+export default function ReportsStatus({darkMode}) {
   const [totalBooks, setTotalBooks] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const [issuedBooks, setIssuedBooks] = useState(0);
@@ -12,6 +12,27 @@ export default function ReportsStatus() {
   const [recentActivity, setRecentActivity] = useState([]);
   const [weeklyReports, setWeeklyReports] = useState([]);
   const [reportType, setReportType] = useState("weekly"); // weekly, monthly, yearly, custom
+  
+  const [format, setFormat] = useState("pdf");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const handleDownload = () => {
+    if (reportType === "custom" && (!startDate || !endDate)) {
+      return toast.error("Please select start and end date for custom report");
+    }
+
+    const url = new URL("http://localhost:5000/api/admin/reports/download");
+    url.searchParams.append("type", reportType);
+    url.searchParams.append("format", format);
+
+    if (reportType === "custom") {
+      url.searchParams.append("startDate", startDate);
+      url.searchParams.append("endDate", endDate);
+    }
+
+    window.open(url.toString(), "_blank");
+  };
 
   useEffect(() => {
     fetchStats();
@@ -84,7 +105,174 @@ export default function ReportsStatus() {
 
 
   return (
-    <div className="p-6 space-y-6">
+    <>
+    {darkMode?(<div className="p-6 space-y-6">
+  <h2 className="text-2xl font-bold text-[#1b365d] dark:text-blue-300 mb-4">Reports & Status</h2>
+
+  {/* Summary Cards */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {[totalBooks, totalUsers, issuedBooks, overdueCount].map((count, idx) => {
+      const icons = [FaBook, FaUsers, FaBookmark, FaExclamationTriangle];
+      const labels = ['Total Books', 'Total Users', 'Books Issued', 'Overdue Books'];
+      const Icon = icons[idx];
+      return (
+        <div
+          key={idx}
+          className="p-4 bg-[#dceafb] dark:bg-gray-700 rounded-lg shadow flex items-center gap-4"
+        >
+          <Icon className="text-3xl text-[#1b365d] dark:text-blue-300" />
+          <div>
+            <p className="text-gray-600 dark:text-gray-300">{labels[idx]}</p>
+            <h3 className="text-xl font-bold text-[#1b365d] dark:text-blue-300">{count}</h3>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  {/* Reports Download Section */}
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4 border dark:border-gray-700">
+    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Download Reports</h3>
+
+    {/* Report Type */}
+    <div>
+      <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">Report Type</label>
+      <select
+        value={reportType}
+        onChange={(e) => setReportType(e.target.value)}
+        className="w-full p-2 border rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:border-gray-600"
+      >
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+        <option value="custom">Custom Timeline</option>
+      </select>
+    </div>
+
+    {/* Date Range for Custom */}
+    {reportType === "custom" && (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full p-2 border rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:border-gray-600"
+          />
+        </div>
+        <div>
+          <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full p-2 border rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:border-gray-600"
+          />
+        </div>
+      </div>
+    )}
+
+    {/* Format */}
+    <div>
+      <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">Format</label>
+      <select
+        value={format}
+        onChange={(e) => setFormat(e.target.value)}
+        className="w-full p-2 border rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:border-gray-600"
+      >
+        <option value="pdf">PDF</option>
+        <option value="excel">Excel</option>
+      </select>
+    </div>
+
+    {/* Download Button */}
+    <button
+      onClick={handleDownload}
+      className="flex items-center gap-2 bg-[#3a7ce1] text-white px-4 py-2 rounded hover:bg-[#285dad] w-full justify-center"
+    >
+      <FaDownload /> Download Report
+    </button>
+  </div>
+
+  {/* Weekly Reports Section */}
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4 border dark:border-gray-700">
+    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Weekly Reports</h3>
+    {weeklyReports.length === 0 ? (
+      <p className="text-gray-500 dark:text-gray-400">No weekly reports available.</p>
+    ) : (
+      <table className="min-w-full text-sm text-gray-800 dark:text-gray-100">
+        <thead>
+          <tr className="bg-gray-100 dark:bg-gray-700 text-left">
+            <th className="p-2">Week</th>
+            <th className="p-2">Issued Books</th>
+            <th className="p-2">Returned</th>
+            <th className="p-2">Overdue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {weeklyReports.map((report) => (
+            <tr key={`${report.year}-${report.week}`} className="border-t border-gray-300 dark:border-gray-600">
+              <td className="p-2">
+                Week {report.week} ({new Date(report.week_start).toLocaleDateString()} - {new Date(report.week_end).toLocaleDateString()})
+              </td>
+              <td className="p-2">{report.issued}</td>
+              <td className="p-2">{report.returned}</td>
+              <td className="p-2">{report.overdue}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+  {/* Popular Books */}
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4 border dark:border-gray-700">
+    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Most Popular Books</h3>
+    {popularBooks.length === 0 ? (
+      <p className="text-gray-500 dark:text-gray-400">No data available.</p>
+    ) : (
+      <table className="min-w-full text-sm text-gray-800 dark:text-gray-100">
+        <thead>
+          <tr className="bg-gray-100 dark:bg-gray-700 text-left">
+            <th className="p-2">Title</th>
+            <th className="p-2">Author</th>
+            <th className="p-2">Times Issued</th>
+          </tr>
+        </thead>
+        <tbody>
+          {popularBooks.map((book) => (
+            <tr key={book.id} className="border-t border-gray-300 dark:border-gray-600">
+              <td className="p-2">{book.title}</td>
+              <td className="p-2">{book.author}</td>
+              <td className="p-2">{book.issuedCount}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+  {/* Recent Activity */}
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4 border dark:border-gray-700">
+    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Recent User Activity</h3>
+    {recentActivity.length === 0 ? (
+      <p className="text-gray-500 dark:text-gray-400">No recent activity found.</p>
+    ) : (
+      <ul className="space-y-2 text-gray-800 dark:text-gray-100">
+        {recentActivity.map((activity) => (
+          <li key={activity.id} className="border-b border-gray-300 dark:border-gray-600 py-2">
+            <div>{activity.activity}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              on {new Date(activity.timestamp).toLocaleString()}
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</div>
+):(<div className="p-6 space-y-6">
       <h2 className="text-2xl font-bold text-[#1b365d] mb-4">Reports & Status</h2>
 
       {/* Summary Cards */}
@@ -126,33 +314,70 @@ export default function ReportsStatus() {
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
         <h3 className="text-xl font-semibold text-gray-800 mb-2">Download Reports</h3>
 
-        <div className="flex flex-wrap items-center gap-4">
+
+      <div className="bg-white p-4 rounded-lg shadow space-y-4">
+        
+        {/* Report Type */}
+        <div>
+          <label className="block mb-2 text-gray-700 font-medium">Report Type</label>
           <select
             value={reportType}
             onChange={(e) => setReportType(e.target.value)}
-            className="p-2 border rounded-lg shadow"
+            className="w-full p-2 border rounded-lg shadow"
           >
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
             <option value="custom">Custom Timeline</option>
           </select>
-
-          <button
-            onClick={() => downloadReport("pdf")}
-            className="flex items-center gap-2 bg-[#3a7ce1] text-white px-3 py-2 rounded hover:bg-[#285dad]"
-          >
-            <FaDownload /> PDF
-          </button>
-
-          <button
-            onClick={() => downloadReport("excel")}
-            className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600"
-          >
-            <FaDownload /> Excel
-          </button>
         </div>
+
+        {/* Date Range for Custom */}
+        {reportType === "custom" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2 text-gray-700 font-medium">Start Date</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full p-2 border rounded-lg shadow"
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-gray-700 font-medium">End Date</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full p-2 border rounded-lg shadow"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Format */}
+        <div>
+          <label className="block mb-2 text-gray-700 font-medium">Format</label>
+          <select
+            value={format}
+            onChange={(e) => setFormat(e.target.value)}
+            className="w-full p-2 border rounded-lg shadow"
+          >
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+          </select>
+        </div>
+
+        {/* Download Button */}
+        <button
+          onClick={handleDownload}
+          className="flex items-center gap-2 bg-[#3a7ce1] text-white px-4 py-2 rounded hover:bg-[#285dad] w-full justify-center"
+        >
+          <FaDownload /> Download Report
+        </button>
       </div>
+    </div>
 
       {/* Weekly Reports Section */}
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
@@ -231,6 +456,7 @@ export default function ReportsStatus() {
           </ul>
         )}
       </div>
-    </div>
+    </div>)}
+    </>
   );
 }

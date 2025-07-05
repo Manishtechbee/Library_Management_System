@@ -3,7 +3,7 @@ import { FaDownload } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function ExportData() {
+export default function ExportData({darkMode}) {
   const [reportType, setReportType] = useState("weekly");
   const [format, setFormat] = useState("pdf");
   const [startDate, setStartDate] = useState("");
@@ -27,7 +27,74 @@ export default function ExportData() {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto space-y-6">
+   <>
+   {darkMode?(<div className="p-6 max-w-xl mx-auto space-y-6">
+  <h2 className="text-2xl font-bold text-[#1b365d] dark:text-blue-300 mb-4">Export Reports</h2>
+
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4 border dark:border-gray-700">
+    
+    {/* Report Type */}
+    <div>
+      <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">Report Type</label>
+      <select
+        value={reportType}
+        onChange={(e) => setReportType(e.target.value)}
+        className="w-full p-2 border dark:border-gray-600 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+      >
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+        <option value="custom">Custom Timeline</option>
+      </select>
+    </div>
+
+    {/* Date Range for Custom */}
+    {reportType === "custom" && (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full p-2 border dark:border-gray-600 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+          />
+        </div>
+        <div>
+          <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full p-2 border dark:border-gray-600 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+          />
+        </div>
+      </div>
+    )}
+
+    {/* Format */}
+    <div>
+      <label className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">Format</label>
+      <select
+        value={format}
+        onChange={(e) => setFormat(e.target.value)}
+        className="w-full p-2 border dark:border-gray-600 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+      >
+        <option value="pdf">PDF</option>
+        <option value="excel">Excel</option>
+      </select>
+    </div>
+
+    {/* Download Button */}
+    <button
+      onClick={handleDownload}
+      className="flex items-center gap-2 bg-[#3a7ce1] text-white px-4 py-2 rounded hover:bg-[#285dad] w-full justify-center"
+    >
+      <FaDownload /> Download Report
+    </button>
+  </div>
+</div>
+):( <div className="p-6 max-w-xl mx-auto space-y-6">
       <h2 className="text-2xl font-bold text-[#1b365d] mb-4">Export Reports</h2>
 
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
@@ -92,6 +159,7 @@ export default function ExportData() {
           <FaDownload /> Download Report
         </button>
       </div>
-    </div>
+    </div>)}
+   </>
   );
 }

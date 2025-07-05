@@ -20,7 +20,7 @@ import {
   FaGraduationCap
 } from "react-icons/fa";
 
-export default function Sidebar() {
+export default function Sidebar({darkMode}) {
   
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -34,7 +34,198 @@ export default function Sidebar() {
   };
 
   return (
-    <motion.div
+    <>
+    {darkMode?(<motion.div
+  initial={{ x: -200, opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  transition={{ duration: 0.5, ease: "easeOut" }}
+  className="w-64 bg-[#f0f7fc] dark:bg-[#1a2533] border-r border-[#d7e4f2] dark:border-gray-700 shadow-sm min-h-screen flex flex-col justify-between"
+>
+  {/* Top Section */}
+  <div className="p-6">
+    <div className="flex items-center gap-3 mb-6">
+      <img
+        src={`https://ui-avatars.com/api/?name=${studentName.replace(" ", "+")}&background=3a7ce1&color=fff`}
+        alt="Avatar"
+        className="w-10 h-10 rounded-full"
+      />
+      <h2 className="text-xl font-bold text-[#1b365d] dark:text-white">{studentName}</h2>
+    </div>
+
+    {/* Common Navigation */}
+    <nav className="space-y-3">
+      <NavLink
+        to="/"
+        end
+        className={({ isActive }) =>
+          `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+            isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+          }`
+        }
+      >
+        <FaGlobe />
+        Home
+      </NavLink>
+
+      <NavLink
+        to={`/dashboard/${role}`}
+        end
+        className={({ isActive }) =>
+          `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+            isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+          }`
+        }
+      >
+        <FaHome />
+        Dashboard
+      </NavLink>
+
+      <NavLink
+        to={`/dashboard/${role}/catalog`}
+        className={({ isActive }) =>
+          `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+            isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+          }`
+        }
+      >
+        <FaSearch />
+        Book Catalog
+      </NavLink>
+    </nav>
+
+    {/* Role Specific Links */}
+    <div className="mt-6 space-y-3">
+      {role === "student" && (
+        <>
+          <NavLink
+            to={`/dashboard/${role}/MyBooks`}
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+                isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+              }`
+            }
+          >
+            <FaBook />
+            My Books
+          </NavLink>
+
+          <NavLink
+            to={`/dashboard/${role}/reservations`}
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+                isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+              }`
+            }
+          >
+            <FaBookmark />
+            Reservations
+          </NavLink>
+
+          <NavLink
+            to={`/dashboard/${role}/fines`}
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+                isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+              }`
+            }
+          >
+            <FaMoneyBillWave />
+            Fines
+          </NavLink>
+        </>
+      )}
+
+      {role === "faculty" && (
+        <>
+          <NavLink
+            to={`/dashboard/faculty/MyBooks`}
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+                isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+              }`
+            }
+          >
+            <FaClipboardList />
+            Issued Books
+          </NavLink>
+
+          <NavLink
+            to={`/dashboard/${role}/fines`}
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+                isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+              }`
+            }
+          >
+            <FaMoneyBillWave />
+            My Fines
+          </NavLink>
+
+          <NavLink
+            to={`/dashboard/faculty/recommendations`}
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+                isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+              }`
+            }
+          >
+            <FaLightbulb />
+            Recommendations
+          </NavLink>
+        </>
+      )}
+
+      <NavLink
+        to={`/dashboard/${role}/profile`}
+        className={({ isActive }) =>
+          `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+            isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+          }`
+        }
+      >
+        <FaUser />
+        Profile
+      </NavLink>
+
+      <NavLink
+        to={`/dashboard/${role}/settings`}
+        className={({ isActive }) =>
+          `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+            isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+          }`
+        }
+      >
+        <FaCog />
+        Settings
+      </NavLink>
+
+      <NavLink
+        to={`/dashboard/${role}/support`}
+        className={({ isActive }) =>
+          `flex items-center gap-3 p-2 rounded-lg transition hover:bg-[#dceafb] dark:hover:bg-gray-700 ${
+            isActive ? "bg-[#dceafb] dark:bg-gray-700 font-medium text-[#1b365d] dark:text-white" : "text-gray-700 dark:text-gray-300"
+          }`
+        }
+      >
+        <FaQuestionCircle />
+        Support
+      </NavLink>
+    </div>
+  </div>
+
+  {/* Logout Button */}
+  <div className="p-6">
+    <motion.button
+      whileTap={{ scale: 0.95 }}
+      onClick={handleLogout}
+      className="flex items-center justify-center gap-3 w-full p-2 bg-[#3a7ce1] text-white rounded-lg hover:bg-[#285dad] transition"
+    >
+      <FaSignOutAlt />
+      Logout
+    </motion.button>
+  </div>
+</motion.div>
+):(<motion.div
       initial={{ x: -200, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -275,6 +466,7 @@ export default function Sidebar() {
           Logout
         </motion.button>
       </div>
-    </motion.div>
+    </motion.div>)}
+    </>
   );
 }

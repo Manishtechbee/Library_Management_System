@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FaDownload, FaTrash, FaDatabase, FaSync, FaUndo } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-export default function BackupControl() {
+export default function BackupControl({darkMode}) {
   const [backups, setBackups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
@@ -70,7 +70,74 @@ export default function BackupControl() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <>
+    {darkMode?(<div className="p-6 max-w-3xl space-y-6">
+  <h2 className="text-2xl font-bold text-[#1b365d] dark:text-white mb-4">Backup & Control</h2>
+
+  {/* Backup Section */}
+  <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow space-y-4">
+    <div className="flex items-center justify-between mb-2">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+        <FaDatabase /> Database Backups
+      </h3>
+      <button
+        onClick={fetchBackups}
+        className="flex items-center gap-1 text-[#3a7ce1] hover:underline dark:text-blue-400"
+      >
+        <FaSync /> Refresh
+      </button>
+    </div>
+
+    <button
+      onClick={triggerBackup}
+      disabled={loading}
+      className="bg-[#3a7ce1] text-white px-4 py-2 rounded hover:bg-[#285dad] disabled:opacity-50"
+    >
+      {loading ? "Processing..." : "Create Backup"}
+    </button>
+
+    {backups.length === 0 ? (
+      <p className="text-gray-500 dark:text-gray-300">No backups available.</p>
+    ) : (
+      <table className="min-w-full text-sm mt-4">
+        <thead>
+          <tr className="bg-gray-100 dark:bg-gray-700 text-left text-gray-800 dark:text-gray-100">
+            <th className="p-2">File</th>
+            <th className="p-2">Size (MB)</th>
+            <th className="p-2">Created</th>
+            <th className="p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {backups.map(backup => (
+            <tr key={backup.file} className="border-t border-gray-200 dark:border-gray-600">
+              <td className="p-2 text-gray-700 dark:text-gray-200">{backup.file}</td>
+              <td className="p-2 text-gray-700 dark:text-gray-200">{backup.sizeMB}</td>
+              <td className="p-2 text-gray-700 dark:text-gray-200">
+                {new Date(backup.created).toLocaleString()}
+              </td>
+              <td className="p-2 flex gap-2">
+                <button
+                  onClick={() => downloadBackup(backup.file)}
+                  className="text-[#3a7ce1] hover:underline dark:text-blue-400"
+                >
+                  <FaDownload /> Download
+                </button>
+                <button
+                  onClick={() => restoreBackup(backup.file)}
+                  className="text-green-600 hover:underline dark:text-green-400"
+                >
+                  <FaUndo /> Restore
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+</div>
+):(<div className="p-6 max-w-3xl mx-auto space-y-6">
       <h2 className="text-2xl font-bold text-[#1b365d] mb-4">Backup & Control</h2>
 
       {/* Backup Section */}
@@ -133,6 +200,7 @@ export default function BackupControl() {
           </table>
         )}
       </div>
-    </div>
+    </div>)}
+    </>
   );
 }

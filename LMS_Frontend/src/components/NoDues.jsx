@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export default function NoDuesRequest({ userId }) {
+export default function NoDuesRequest({ userId ,darkMode=false}) {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     studentName: "",
@@ -36,10 +36,10 @@ export default function NoDuesRequest({ userId }) {
     <>
       {/* No Dues Request Section */}
       <div className="space-y-4 mb-6 mt-10">
-        <h3 className="text-base font-medium text-gray-700 mb-2">
+        <h3 className={darkMode?"text-gray-100 text-base font-medium mb-2":"text-base font-medium text-gray-700 mb-2"}>
           No Dues Certificate
         </h3>
-        <p className="text-sm text-gray-600 mb-2">
+        <p className={darkMode?"text-gray-100 text-sm mb-2 ":"text-sm text-gray-600 mb-2 "}>
           You can request a No Dues Certificate from the library. Once approved,
           you'll receive confirmation via system notifications.
         </p>

@@ -26,6 +26,7 @@ const handleGetStarted = () => {
 
 
   return (
+    
     <section className={`${darkMode ? "bg-[#0c1d33]" : "bg-[#e8f1fb]"} py-10 pb-40 relative overflow-hidden`}>
   <div className="max-w-7xl mx-auto px-6 flex flex-col-reverse md:flex-row items-center justify-between gap-16">
 
@@ -40,7 +41,7 @@ const handleGetStarted = () => {
         transition={{ duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
         viewport={{ amount: 0.3 }}
       >
-        Library<br />Management<br />System
+        Learning<br />Management<br />System
       </motion.h1>
 
       <motion.p
@@ -52,7 +53,7 @@ const handleGetStarted = () => {
         transition={{ duration: 0.6, delay: 0.2, ease: [0.43, 0.13, 0.23, 0.96] }}
         viewport={{ amount: 0.3 }}
       >
-        Streamline library operations with ease.<br />Manage books, members, issuance, and returns efficiently.
+        Streamline learning operations with ease.<br />Manage books, members, issuance, and returns efficiently.
       </motion.p>
 
       <motion.button

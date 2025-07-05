@@ -101,7 +101,7 @@ const [address, setAddress] = useState(null);
         <div className={`min-h-screen flex items-start p-6 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
     <div className="w-full max-w-6xl space-y-12">
       <h1 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-800"}`}>
-        Faculty Settings
+        Student Settings
       </h1>
       {/*<div className="min-h-screen bg-white flex justify-center items-start p-5">
       <div className="w-full max-w-6xl space-y-12">
