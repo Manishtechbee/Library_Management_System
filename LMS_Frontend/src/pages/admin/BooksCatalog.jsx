@@ -22,7 +22,7 @@ export default function BooksCatalog({darkMode}) {
 
   
 
-axios.get("http://localhost:5000/api/books")
+axios.get("https://learning-management-system-1zty.onrender.com/api/books")
   .then(async (res) => {
     const booksWithImages = await Promise.all(res.data.map(async (book) => {
       try {
@@ -112,7 +112,7 @@ axios.get("http://localhost:5000/api/books")
   });
 
   const handleIssue = (book) => {
-  axios.post("http://localhost:5000/api/request-issue", {
+  axios.post("https://learning-management-system-1zty.onrender.com/api/request-issue", {
     book_id: book.id,
     user_id: user.id
   })

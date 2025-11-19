@@ -31,7 +31,7 @@ export default function EResourcesPage({darkMode}) {
     );
 
     axios
-      .put(`http://localhost:5000/api/bookmarks/${id}/bookmark`, { user_id: userId })
+      .put(`https://learning-management-system-1zty.onrender.com/api/bookmarks/${id}/bookmark`, { user_id: userId })
       .then(() => {
         toast.success("Bookmarked!");
       })
@@ -44,7 +44,7 @@ export default function EResourcesPage({darkMode}) {
   // If in "Bookmarked" tab → Allow only removing bookmark
   if (activeTab === "bookmarked") {
     axios
-      .put(`http://localhost:5000/api/bookmarks/${id}/bookmark`, { user_id: userId })
+      .put(`https://learning-management-system-1zty.onrender.com/api/bookmarks/${id}/bookmark`, { user_id: userId })
       .then(() => {
         toast.success("Bookmark removed!");
 
@@ -80,8 +80,8 @@ export default function EResourcesPage({darkMode}) {
   const fetchResources = () => {
     const url =
     activeTab === "bookmarked"
-      ? `http://localhost:5000/api/bookmarks/bookmarked?user_id=${user.id}`
-      : `http://localhost:5000/api`
+      ? `https://learning-management-system-1zty.onrender.com/api/bookmarks/bookmarked?user_id=${user.id}`
+      : `https://learning-management-system-1zty.onrender.com/api`
 
   axios.get(url)
     .then((res) => {

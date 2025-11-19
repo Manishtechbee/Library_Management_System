@@ -41,18 +41,18 @@ const [filterValue, setFilterValue] = useState("");
 
 useEffect(() => {
   fetchBooks();
-  fetch("http://localhost:5000/api/admin/categories")
+  fetch("https://learning-management-system-1zty.onrender.com/api/admin/categories")
     .then((res) => res.json())
     .then(setCategories)
     .catch(console.error);
 
-  fetch("http://localhost:5000/api/admin/publishers")
+  fetch("https://learning-management-system-1zty.onrender.com/api/admin/publishers")
     .then((res) => res.json())
     .then(setPublishers)
     .catch(console.error);
 }, []);
 const fetchBooks = () => {
-  axios.get("http://localhost:5000/api/books")
+  axios.get("https://learning-management-system-1zty.onrender.com/api/books")
     .then(async (res) => {
       const booksWithImages = await Promise.all(res.data.map(async (book) => {
         try {
@@ -103,7 +103,7 @@ const fetchBooks = () => {
   }
 
   try {
-    await axios.post("http://localhost:5000/api/librarian/request-book", {
+    await axios.post("https://learning-management-system-1zty.onrender.com/api/librarian/request-book", {
       title,
       author,
       description,
@@ -135,7 +135,7 @@ const fetchBooks = () => {
   const handleDelete = async (id) => {
   if (!window.confirm("Are you sure you want to delete this book?")) return;
   try {
-    await axios.delete(`http://localhost:5000/api/admin/books/${id}`);
+    await axios.delete(`https://learning-management-system-1zty.onrender.com/api/admin/books/${id}`);
     toast.success("Book deleted successfully");
     fetchBooks();
   } catch (err) {
@@ -181,7 +181,7 @@ const fetchBooks = () => {
   if (coverImage) formData.append("coverImage", coverImage);
 
   try {
-    await axios.put(`http://localhost:5000/api/admin/books/${editBookData.id}`, formData);
+    await axios.put(`https://learning-management-system-1zty.onrender.com/api/admin/books/${editBookData.id}`, formData);
     toast.success("Book updated successfully");
     setShowEditModal(false);
     fetchBooks();

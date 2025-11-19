@@ -11,7 +11,7 @@ export default function IssueRequestsPanel() {
 
   // Fetch Functions
   const fetchRequests = () => {
-    fetch("http://localhost:5000/api/admin/issuerequests")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/issuerequests")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setRequests(data);
@@ -21,21 +21,21 @@ export default function IssueRequestsPanel() {
   };
 
   const fetchReturnedBooks = () => {
-    fetch("http://localhost:5000/api/admin/returnedbooks")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/returnedbooks")
       .then(res => res.json())
       .then(data => setReturnedBooks(data))
       .catch(() => toast.error("Error fetching returned books"));
   };
 
   const fetchOverdueBooks = () => {
-    fetch("http://localhost:5000/api/admin/overduebooks")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/overduebooks")
       .then(res => res.json())
       .then(data => setOverdueBooks(data))
       .catch(() => toast.error("Error fetching overdue books"));
   };
 
   const fetchFineData = () => {
-    fetch("http://localhost:5000/api/admin/manualfines")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/manualfines")
       .then(res => res.json())
       .then(data => setFineData(data))
       .catch(() => toast.error("Error fetching fine data"));
@@ -43,7 +43,7 @@ export default function IssueRequestsPanel() {
 
   // Status Update
   const updateStatus = (id, status) => {
-    fetch(`http://localhost:5000/api/admin/issuerequests/${id}`, {
+    fetch(`https://learning-management-system-1zty.onrender.com/api/admin/issuerequests/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),

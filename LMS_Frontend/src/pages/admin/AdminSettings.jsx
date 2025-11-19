@@ -22,7 +22,7 @@ export default function AdminSettings({ darkMode, toggleDarkMode }) {
 
 useEffect(() => {
   if (storedUser?.id) {
-    fetch(`http://localhost:5000/api/student/${storedUser.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/student/${storedUser.id}`)
       .then(res => res.json())
       .then(data => {
         setName(data.name);
@@ -33,7 +33,7 @@ useEffect(() => {
         
         const ProfileImage = data.profileImage==null?
         `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=cccccc&color=000&size=128`:
-        `http://localhost:5000${data.profileImage}`;
+        `https://learning-management-system-1zty.onrender.com${data.profileImage}`;
         console.log(ProfileImage);
         
         
@@ -54,13 +54,13 @@ useEffect(() => {
 
       const formData = new FormData();
       formData.append("profileImage", file);
-      fetch(`http://localhost:5000/api/student/upload-profile/${storedUser.id}`, {
+      fetch(`https://learning-management-system-1zty.onrender.com/api/student/upload-profile/${storedUser.id}`, {
         method: "POST",
         body: formData
       })
         .then(res => res.json())
         .then(data => {
-          setAvatar(`http://localhost:5000${data.imagePath}`);
+          setAvatar(`https://learning-management-system-1zty.onrender.com${data.imagePath}`);
           toast.success("Profile Image Updated!");
         })
         .catch(err => console.error(err));
@@ -68,7 +68,7 @@ useEffect(() => {
   };
 
   const handleSave = () => {
-  fetch(`http://localhost:5000/api/student/${storedUser.id}`, {
+  fetch(`https://learning-management-system-1zty.onrender.com/api/student/${storedUser.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, phone, address })
@@ -87,7 +87,7 @@ useEffect(() => {
 
   const handleProfileUpdate = () => {
     setLoading(true);
-    axios.put(`http://localhost:5000/api/admin/profile/${storedUser.id}`, {
+    axios.put(`https://learning-management-system-1zty.onrender.com/api/admin/profile/${storedUser.id}`, {
       name, phone, address
     })
       .then(() => {
@@ -109,7 +109,7 @@ useEffect(() => {
     setLoading(true);
     const user = JSON.parse(localStorage.getItem("user"));
 
-    const res = await fetch(`http://localhost:5000/api/student/update-password/${user.id}`, {
+    const res = await fetch(`https://learning-management-system-1zty.onrender.com/api/student/update-password/${user.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -138,7 +138,7 @@ useEffect(() => {
   const handleToggleNotifications = () => {
     const updated = !notifications;
     setNotifications(updated);
-    {/*axios.put(`http://localhost:5000/api/admin/settings/${storedUser.id}`, { notifications: updated })
+    {/*axios.put(`https://learning-management-system-1zty.onrender.com/api/admin/settings/${storedUser.id}`, { notifications: updated })
       .then(() => {
         toast.success(`Notifications ${updated ? "enabled" : "disabled"}`);
       })

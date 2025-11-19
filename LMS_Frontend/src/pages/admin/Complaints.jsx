@@ -15,7 +15,7 @@ export default function ComplaintsManagement({darkMode}) {
 
   const fetchComplaints = () => {
     axios
-      .get("http://localhost:5000/api/admin/complaints")
+      .get("https://learning-management-system-1zty.onrender.com/api/admin/complaints")
       .then((res) => setComplaints(res.data))
       .catch(() => toast.error("Failed to fetch complaints"));
   };
@@ -23,7 +23,7 @@ export default function ComplaintsManagement({darkMode}) {
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this complaint?")) return;
     axios
-      .delete(`http://localhost:5000/api/admin/complaints/${id}`)
+      .delete(`https://learning-management-system-1zty.onrender.com/api/admin/complaints/${id}`)
       .then(() => {
         toast.success("Complaint deleted");
         fetchComplaints();
@@ -33,7 +33,7 @@ export default function ComplaintsManagement({darkMode}) {
 
   const markAsResolved = (id) => {
     axios
-      .put(`http://localhost:5000/api/admin/complaints/${id}`, { status: "Resolved" })
+      .put(`https://learning-management-system-1zty.onrender.com/api/admin/complaints/${id}`, { status: "Resolved" })
       .then(() => {
         toast.success("Complaint marked as resolved");
         fetchComplaints();

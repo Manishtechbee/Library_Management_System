@@ -6,7 +6,7 @@ export default function NoDuesPanel({darkMode}) {
   const [requests, setRequests] = useState([]);
 
   const fetchRequests = () => {
-    fetch("http://localhost:5000/api/admin/nodues")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/nodues")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -27,7 +27,7 @@ export default function NoDuesPanel({darkMode}) {
   }, []);
 
   const updateStatus = (id, status) => {
-    fetch(`http://localhost:5000/api/admin/nodues/${id}`, {
+    fetch(`https://learning-management-system-1zty.onrender.com/api/admin/nodues/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -79,7 +79,7 @@ export default function NoDuesPanel({darkMode}) {
               <td className="p-2">
                 {req.status === "approved" && req.certificate_url ? (
                   <a
-                    href={`http://localhost:5000${req.certificate_url}`}
+                    href={`https://learning-management-system-1zty.onrender.com${req.certificate_url}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 dark:text-blue-400 underline"
@@ -155,7 +155,7 @@ export default function NoDuesPanel({darkMode}) {
                   <td className="p-2">
                     {req.status === "approved" && req.certificate_url ? (
                       <a
-                        href={`http://localhost:5000${req.certificate_url}`}
+                        href={`https://learning-management-system-1zty.onrender.com${req.certificate_url}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 underline"

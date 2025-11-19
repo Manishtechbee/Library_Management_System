@@ -102,7 +102,7 @@ useEffect(() => {
     if (!user) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${user.id}/dark-mode`, {
+      const res = await fetch(`https://learning-management-system-1zty.onrender.com/api/users/${user.id}/dark-mode`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dark_mode: darkMode ? 0 : 1 })

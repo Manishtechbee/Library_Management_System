@@ -32,7 +32,7 @@ export default function RecommendBookPage({darkMode}) {
   if (!user?.id) return;
 
   setLoadingRecommendations(true);
-  fetch(`http://localhost:5000/api/faculty/recommended-books/${user.id}`)
+  fetch(`https://learning-management-system-1zty.onrender.com/api/faculty/recommended-books/${user.id}`)
     .then((res) => res.json())
     .then((data) => setRecommendations(data))
     .catch((err) => console.error(err))
@@ -58,7 +58,7 @@ export default function RecommendBookPage({darkMode}) {
     setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/faculty/recommend-book`, {
+      const res = await fetch(`https://learning-management-system-1zty.onrender.com/api/faculty/recommend-book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, facultyId: user.id }),

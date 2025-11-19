@@ -14,7 +14,7 @@ export default function NotificationBell({ userId ,darkMode}) {
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
   const markAllAsRead = () => {
-  fetch(`http://localhost:5000/api/notifications/mark-all-read/${userId}`, {
+  fetch(`https://learning-management-system-1zty.onrender.com/api/notifications/mark-all-read/${userId}`, {
     method: 'PUT'
   })
     .then(res => res.json())
@@ -31,7 +31,7 @@ export default function NotificationBell({ userId ,darkMode}) {
 
   // Fetch Existing Notifications from Backend
   useEffect(() => {
-    fetch(`http://localhost:5000/api/notifications/${userId}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/notifications/${userId}`)
       .then(res => res.json())
       .then(data => {
         const formatted = data.map(n => ({
@@ -47,7 +47,7 @@ export default function NotificationBell({ userId ,darkMode}) {
 
   // Setup Socket.io for Real-Time Notifications
   useEffect(() => {
-    socketRef.current = io('http://localhost:5000');
+    socketRef.current = io('https://learning-management-system-1zty.onrender.com');
 
     socketRef.current.emit('join', userId);
 

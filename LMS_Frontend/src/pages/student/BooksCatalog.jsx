@@ -17,7 +17,7 @@ export default function BooksCatalog({darkMode}) {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api/books")
+      .get("https://learning-management-system-1zty.onrender.com/api/books")
       .then(async (res) => {
         const booksWithImages = await Promise.all(
           res.data.map(async (book) => {
@@ -131,7 +131,7 @@ export default function BooksCatalog({darkMode}) {
 
   const handleIssue = (book) => {
     axios
-      .post("http://localhost:5000/api/request-issue", {
+      .post("https://learning-management-system-1zty.onrender.com/api/request-issue", {
         book_id: book.id,
         user_id: user.id,
       })

@@ -17,7 +17,7 @@ export default function StudentSupervisionPage() {
     if (!user?.id) return;
     setLoading(true);
 
-    fetch(`http://localhost:5000/api/faculty/students/${user.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/faculty/students/${user.id}`)
       .then(res => res.json())
       .then(data => setStudents(data))
       .catch(err => console.error(err))
@@ -32,7 +32,7 @@ export default function StudentSupervisionPage() {
     setSelectedStudent(student);
     setLoadingBooks(true);
 
-    fetch(`http://localhost:5000/api/faculty/student-books/${student.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/faculty/student-books/${student.id}`)
       .then(res => res.json())
       .then(data => setBorrowedBooks(data))
       .catch(err => console.error(err))
@@ -40,7 +40,7 @@ export default function StudentSupervisionPage() {
   };
 
   const handleSendReminder = (student) => {
-    fetch(`http://localhost:5000/api/faculty/send-reminder`, {
+    fetch(`https://learning-management-system-1zty.onrender.com/api/faculty/send-reminder`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ studentId: student.id }),

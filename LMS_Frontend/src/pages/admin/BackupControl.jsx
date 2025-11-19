@@ -13,7 +13,7 @@ export default function BackupControl({darkMode}) {
 
   const fetchBackups = () => {
     setLoading(true);
-    fetch("http://localhost:5000/api/backups/list")
+    fetch("https://learning-management-system-1zty.onrender.com/api/backups/list")
       .then(res => res.json())
       .then(data => setBackups(data))
       .catch(() => toast.error("Failed to load backups"))
@@ -25,7 +25,7 @@ export default function BackupControl({darkMode}) {
     if (!pwd) return;
 
     setLoading(true);
-    fetch("http://localhost:5000/api/backups/trigger", {
+    fetch("https://learning-management-system-1zty.onrender.com/api/backups/trigger", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password: pwd }),
@@ -44,7 +44,7 @@ export default function BackupControl({darkMode}) {
   };
 
   const downloadBackup = (file) => {
-    window.open(`http://localhost:5000/api/backups/download/${encodeURIComponent(file)}`, "_blank");
+    window.open(`https://learning-management-system-1zty.onrender.com/api/backups/download/${encodeURIComponent(file)}`, "_blank");
   };
 
   const restoreBackup = (file) => {
@@ -52,7 +52,7 @@ export default function BackupControl({darkMode}) {
     if (!pwd) return;
 
     setLoading(true);
-    fetch("http://localhost:5000/api/backups/restore", {
+    fetch("https://learning-management-system-1zty.onrender.com/api/backups/restore", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ file, password: pwd }),

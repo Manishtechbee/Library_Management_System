@@ -32,7 +32,7 @@ const [address, setAddress] = useState(null);
 
  useEffect(() => {
   if (storedUser?.id) {
-    fetch(`http://localhost:5000/api/student/${storedUser.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/student/${storedUser.id}`)
       .then(res => res.json())
       .then(data => {
         setName(data.name);
@@ -43,7 +43,7 @@ const [address, setAddress] = useState(null);
         
         const ProfileImage = data.profileImage==null?
         `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=cccccc&color=000&size=128`:
-        `http://localhost:5000${data.profileImage}`;
+        `https://learning-management-system-1zty.onrender.com${data.profileImage}`;
         console.log(ProfileImage);
         
         
@@ -64,13 +64,13 @@ const [address, setAddress] = useState(null);
 
       const formData = new FormData();
       formData.append("profileImage", file);
-      fetch(`http://localhost:5000/api/student/upload-profile/${storedUser.id}`, {
+      fetch(`https://learning-management-system-1zty.onrender.com/api/student/upload-profile/${storedUser.id}`, {
         method: "POST",
         body: formData
       })
         .then(res => res.json())
         .then(data => {
-          setAvatar(`http://localhost:5000${data.imagePath}`);
+          setAvatar(`https://learning-management-system-1zty.onrender.com${data.imagePath}`);
           toast.success("Profile Image Updated!");
         })
         .catch(err => console.error(err));
@@ -78,7 +78,7 @@ const [address, setAddress] = useState(null);
   };
 
   const handleSave = () => {
-  fetch(`http://localhost:5000/api/student/${storedUser.id}`, {
+  fetch(`https://learning-management-system-1zty.onrender.com/api/student/${storedUser.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, phone, address })
@@ -540,7 +540,7 @@ window.location.href = "/login";
               const user = JSON.parse(localStorage.getItem("user"));
 
               const res = await fetch(
-                `http://localhost:5000/api/student/update-password/${user.id}`,
+                `https://learning-management-system-1zty.onrender.com/api/student/update-password/${user.id}`,
                 {
                   method: "PUT",
                   headers: { "Content-Type": "application/json" },
@@ -590,7 +590,7 @@ window.location.href = "/login";
             <div className="flex justify-end gap-2">
               <button onClick={() => setShowEmailModal(false)} className="px-4 py-1 bg-gray-300 rounded">Cancel</button>
               <button onClick={() => {
-                fetch(`http://localhost:5000/api/student/update-email/${storedUser.id}`, {
+                fetch(`https://learning-management-system-1zty.onrender.com/api/student/update-email/${storedUser.id}`, {
   method: "PUT",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ newEmail })
@@ -703,7 +703,7 @@ window.location.href = "/login";
 
             try {
               const user = JSON.parse(localStorage.getItem("user"));
-              const res = await fetch(`http://localhost:5000/api/student/update-password/${user.id}`, {
+              const res = await fetch(`https://learning-management-system-1zty.onrender.com/api/student/update-password/${user.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ oldPassword: old, newPassword: newPass }),
@@ -755,7 +755,7 @@ window.location.href = "/login";
 
         <button
           onClick={() => {
-            fetch(`http://localhost:5000/api/student/update-email/${storedUser.id}`, {
+            fetch(`https://learning-management-system-1zty.onrender.com/api/student/update-email/${storedUser.id}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ newEmail }),

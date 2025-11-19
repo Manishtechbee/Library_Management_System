@@ -15,7 +15,7 @@ export default function IssuedBooks() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api/my-issued-books")
+      .get("https://learning-management-system-1zty.onrender.com/api/my-issued-books")
       .then((res) => setIssuedBooks(res.data))
       .catch(() => toast.error("Failed to load issued books"))
       .finally(() => setLoading(false));
@@ -39,7 +39,7 @@ export default function IssuedBooks() {
 
   const handleRenewRequest = (id) => {
     axios
-      .post(`http://localhost:5000/api/request-renewal/${id}`)
+      .post(`https://learning-management-system-1zty.onrender.com/api/request-renewal/${id}`)
       .then(() => {
         toast.success("Renewal requested successfully");
         setIssuedBooks((prev) =>
@@ -54,7 +54,7 @@ export default function IssuedBooks() {
   const handleReturn = (id) => {
     if (confirm("Are you sure you want to mark this book as returned?")) {
       axios
-        .post(`http://localhost:5000/api/mark-returned/${id}`)
+        .post(`https://learning-management-system-1zty.onrender.com/api/mark-returned/${id}`)
         .then(() => {
           toast.success("Book marked as returned");
           setIssuedBooks((prev) =>
@@ -209,7 +209,7 @@ export default function IssuedBooks({ darkMode }) {
     setLoading(true);
 
     axios
-      .get(`http://localhost:5000/api/my-issued-books/${user.id}`)
+      .get(`https://learning-management-system-1zty.onrender.com/api/my-issued-books/${user.id}`)
       .then(async (res) => {
         const booksWithImages = await Promise.all(
           res.data.map(async (book) => {
@@ -245,7 +245,7 @@ export default function IssuedBooks({ darkMode }) {
   const fetchIssuedBooks = () => {
     setLoading(true);
     axios
-      .get(`http://localhost:5000/api/my-issued-books/${user.id}`)
+      .get(`https://learning-management-system-1zty.onrender.com/api/my-issued-books/${user.id}`)
       .then(async (res) => {
         const booksWithImages = await Promise.all(
           res.data.map(async (book) => {
@@ -296,7 +296,7 @@ export default function IssuedBooks({ darkMode }) {
       message: "Are you sure you want to request renewal for this book?",
       onConfirm: () => {
         axios
-          .post(`http://localhost:5000/api/request-renewal/${borrowId}`, {
+          .post(`https://learning-management-system-1zty.onrender.com/api/request-renewal/${borrowId}`, {
             user_id: user_id,
           })
           .then(() => {
@@ -321,7 +321,7 @@ export default function IssuedBooks({ darkMode }) {
       message: "Are you sure you want to mark this book as returned?",
       onConfirm: () => {
         axios
-          .put(`http://localhost:5000/api/return/${borrowId}`)
+          .put(`https://learning-management-system-1zty.onrender.com/api/return/${borrowId}`)
           .then(() => {
             toast.success("Book marked as returned");
             setIssuedBooks((prev) =>

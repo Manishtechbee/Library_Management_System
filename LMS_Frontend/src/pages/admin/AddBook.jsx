@@ -20,12 +20,12 @@ export default function AddBook() {
   const [publishers, setPublishers] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/admin/categories")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/categories")
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
 
-    fetch("http://localhost:5000/api/admin/publishers")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/publishers")
       .then((res) => res.json())
       .then(setPublishers)
       .catch(console.error);
@@ -53,7 +53,7 @@ export default function AddBook() {
     if (coverImage) formData.append("coverImage", coverImage);
 
     try {
-      await axios.post("http://localhost:5000/api/admin/books", formData);
+      await axios.post("https://learning-management-system-1zty.onrender.com/api/admin/books", formData);
       toast.success("Book added successfully");
       // reset form
       setTitle(""); setAuthor(""); setCategoryId(""); setPublisherId(""); setEdition(""); setYear(""); setLanguage(""); setDescription(""); setEbookLink(""); setTotalCopies(1); setCoverImage(null);

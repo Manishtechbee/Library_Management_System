@@ -37,18 +37,18 @@ const [filterValue, setFilterValue] = useState("");
 
 useEffect(() => {
   fetchBooks();
-  fetch("http://localhost:5000/api/admin/categories")
+  fetch("https://learning-management-system-1zty.onrender.com/api/admin/categories")
     .then((res) => res.json())
     .then(setCategories)
     .catch(console.error);
 
-  fetch("http://localhost:5000/api/admin/publishers")
+  fetch("https://learning-management-system-1zty.onrender.com/api/admin/publishers")
     .then((res) => res.json())
     .then(setPublishers)
     .catch(console.error);
 }, []);
 const fetchBooks = () => {
-  axios.get("http://localhost:5000/api/books")
+  axios.get("https://learning-management-system-1zty.onrender.com/api/books")
     .then(async (res) => {
       console.log(res);
       const booksWithImages = await Promise.all(res.data.map(async (book) => {
@@ -115,7 +115,7 @@ const fetchBooks = () => {
       const formDataObj = Object.fromEntries(formData.entries());
 console.log(formDataObj);
 
-      await axios.post("http://localhost:5000/api/books/add", formDataObj);
+      await axios.post("https://learning-management-system-1zty.onrender.com/api/books/add", formDataObj);
       toast.success("Book added successfully");
       fetchBooks();
       resetForm();
@@ -143,7 +143,7 @@ console.log(formDataObj);
   const handleDelete = async (id) => {
   if (!window.confirm("Are you sure you want to delete this book?")) return;
   try {
-    await axios.delete(`http://localhost:5000/api/books/${id}`);
+    await axios.delete(`https://learning-management-system-1zty.onrender.com/api/books/${id}`);
     toast.success("Book deleted successfully");
     fetchBooks();
   } catch (err) {
@@ -191,7 +191,7 @@ console.log(formDataObj);
     const formDataObj = Object.fromEntries(formData.entries());
 console.log(formDataObj);
 
-    await axios.put(`http://localhost:5000/api/books/${editBookData.id}`, formDataObj);
+    await axios.put(`https://learning-management-system-1zty.onrender.com/api/books/${editBookData.id}`, formDataObj);
     toast.success("Book updated successfully");
     setShowEditModal(false);
     fetchBooks();

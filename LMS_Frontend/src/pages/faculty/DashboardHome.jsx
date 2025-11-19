@@ -42,17 +42,17 @@ export default function FacultyDashboard({darkMode}) {
 
     if (!user?.id) return;
 
-    fetch(`http://localhost:5000/api/faculty/stats/${user.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/faculty/stats/${user.id}`)
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(err => console.error(err));
 
-    fetch(`http://localhost:5000/api/faculty/activity/${user.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/faculty/activity/${user.id}`)
       .then(res => res.json())
       .then(data => setActivityList(data))
       .catch(err => console.error(err));
 
-    fetch(`http://localhost:5000/api/system-notifications`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/system-notifications`)
       .then(res => res.json())
       .then(data => {
         setSystemNotifications(data);
@@ -69,7 +69,7 @@ export default function FacultyDashboard({darkMode}) {
       })
       .catch(err => console.error(err));
 
-    fetch(`http://localhost:5000/api/announcements?role=faculty`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/announcements?role=faculty`)
       .then(res => res.json())
       .then(data => setAnnouncements(data))
       .catch(err => console.error(err));
@@ -494,7 +494,7 @@ export default function DashboardHome({darkMode}) {
  useEffect(() => {
   if (!user?.id) return;
 
-  fetch(`http://localhost:5000/api/student/${user.id}`)
+  fetch(`https://learning-management-system-1zty.onrender.com/api/student/${user.id}`)
     .then(res => res.json())
     .then(data => {
       calculateProfileCompletion(data);
@@ -525,7 +525,7 @@ const calculateProfileCompletion = (profileData) => {
 const [systemNotifications, setSystemNotifications] = useState([]);
 
 useEffect(() => {
-  fetch(`http://localhost:5000/api/`)
+  fetch(`https://learning-management-system-1zty.onrender.com/api/`)
     .then(res => res.json())
     .then(data => {
       setSystemNotifications(data);
@@ -558,7 +558,7 @@ useEffect(() => {
 
 
   useEffect(() => {
-  fetch(`http://localhost:5000/api/activity/${user.id}`)
+  fetch(`https://learning-management-system-1zty.onrender.com/api/activity/${user.id}`)
     .then(res => res.json())
     .then(data => setActivityList(data))
     .catch(err => console.error(err));
@@ -566,7 +566,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-  fetch(`http://localhost:5000/api/?role=${user.role}`)
+  fetch(`https://learning-management-system-1zty.onrender.com/api/?role=${user.role}`)
     .then(res => res.json())
     .then(data => setAnnouncements(data))
     .catch(err => console.error(err));
@@ -587,7 +587,7 @@ useEffect(() => {
 useEffect(() => {
   if (!user?.id) return;
 
-  fetch(`http://localhost:5000/api/student/stats/${user.id}`)
+  fetch(`https://learning-management-system-1zty.onrender.com/api/student/stats/${user.id}`)
     .then(res => res.json())
     .then(data => setStats(data))
     .catch(err => console.error(err));

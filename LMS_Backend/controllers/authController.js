@@ -13,7 +13,7 @@ exports.forgotPassword = (req, res) => {
         if (err) return res.status(500).json({ error: 'Database error' });
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Email not found' });
 
-        const resetLink = `http://localhost:5173/reset-password/${token}`;
+        const resetLink = `https://library-management-system-gvge.onrender.com/reset-password/${token}`;
 
         sendResetEmail(email, resetLink)
             .then(() => res.json({ message: 'Password reset link sent to email' }))

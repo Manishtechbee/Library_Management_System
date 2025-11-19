@@ -14,7 +14,7 @@ export default function ExportData({darkMode}) {
       return toast.error("Please select start and end date for custom report");
     }
 
-    const url = new URL("http://localhost:5000/api/admin/reports/download");
+    const url = new URL("https://learning-management-system-1zty.onrender.com/api/admin/reports/download");
     url.searchParams.append("type", reportType);
     url.searchParams.append("format", format);
 

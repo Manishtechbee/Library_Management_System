@@ -8,14 +8,14 @@ export default function OverdueBooks({darkMode}) {
   const [fines, setFines] = useState([]);
 
   const fetchBorrowedBooks = () => {
-    fetch("http://localhost:5000/api/admin/overdue-books")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/overdue-books")
       .then(res => res.json())
       .then(data => setOverdueList(data))
       .catch(err => console.error(err));
   };
 
   const markAsReturned = (id) => {
-    fetch(`http://localhost:5000/api/borrowed-books/${id}/return`, {
+    fetch(`https://learning-management-system-1zty.onrender.com/api/borrowed-books/${id}/return`, {
       method: "PUT",
     })
       .then(res => res.json())
@@ -32,7 +32,7 @@ export default function OverdueBooks({darkMode}) {
   useEffect(() => {
     fetchBorrowedBooks();
 
-    fetch("http://localhost:5000/api/admin/fines")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/fines")
       .then(res => res.json())
       .then(data => setFines(data))
       .catch(err => console.error(err));

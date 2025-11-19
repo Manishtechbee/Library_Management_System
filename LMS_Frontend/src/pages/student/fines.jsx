@@ -22,7 +22,7 @@ export default function Fines({darkMode}) {
   const fetchFines = () => {
     setLoading(true);
     axios
-  .get(`http://localhost:5000/api/student/fines/${user.id}`)
+  .get(`https://learning-management-system-1zty.onrender.com/api/student/fines/${user.id}`)
   .then((res) => {
     const unpaid = res.data.filter(f => f.paid === 0);
     const paid = res.data.filter(f => f.paid === 1);
@@ -61,7 +61,7 @@ const totalPaid = paidFines.reduce((acc, fine) => acc + Number(fine.amount), 0);
 
  const handlePay = (fine) => {
   axios
-    .post("http://localhost:5000/api/student/fines/pay", {
+    .post("https://learning-management-system-1zty.onrender.com/api/student/fines/pay", {
       fine_id: fine.id,
       user_id: user.id,
     })
@@ -75,7 +75,7 @@ const totalPaid = paidFines.reduce((acc, fine) => acc + Number(fine.amount), 0);
 
 const handlePayAll = () => {
   axios
-    .post("http://localhost:5000/api/student/fines/pay-all", {
+    .post("https://learning-management-system-1zty.onrender.com/api/student/fines/pay-all", {
       user_id: user.id,
     })
     .then((res) => {

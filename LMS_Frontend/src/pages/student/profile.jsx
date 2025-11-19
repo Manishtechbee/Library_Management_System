@@ -24,7 +24,7 @@ useEffect(() => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   
   if (storedUser?.id) {
-    fetch(`http://localhost:5000/api/student/${storedUser.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/student/${storedUser.id}`)
       .then(res => res.json())
       .then(data => setUser(data))
       .catch(err => console.error(err));
@@ -35,7 +35,7 @@ const [issueRequests, setIssueRequests] = useState([]);
 
 useEffect(() => {
   if (u?.id) {
-    fetch(`http://localhost:5000/api/${u.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/${u.id}`)
       .then(res => res.json())
       .then(data => setIssueRequests(data))
       .catch(err => console.error(err));
@@ -48,7 +48,7 @@ const [noDues, setNoDues] = useState(null);
 
 useEffect(() => {
   if (u?.id) {
-    fetch(`http://localhost:5000/api/nodues/status/${u.id}`)
+    fetch(`https://learning-management-system-1zty.onrender.com/api/nodues/status/${u.id}`)
       .then(res => res.json())
       .then(data => setNoDues(data))
       .catch(err => console.error(err));
@@ -126,7 +126,7 @@ const [user, setUser] = useState({
     {/* Header */}
     <div className="flex items-center gap-4 mb-6">
       <img
-        src={user.profileImage ? `http://localhost:5000${user.profileImage}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3a7ce1&color=fff`}
+        src={user.profileImage ? `https://learning-management-system-1zty.onrender.com${user.profileImage}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3a7ce1&color=fff`}
         alt="Profile"
         className="w-16 h-16 rounded-full object-cover"
       />
@@ -343,7 +343,7 @@ const [user, setUser] = useState({
             subject: complaintSubject,
             description: complaintDescription,
           };
-          fetch("http://localhost:5000/api/complaints/complaints/add", {
+          fetch("https://learning-management-system-1zty.onrender.com/api/complaints/complaints/add", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(complaintData),
@@ -407,7 +407,7 @@ const [user, setUser] = useState({
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <img
-          src={user.profileImage?`http://localhost:5000${user.profileImage}`:`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3a7ce1&color=fff`}
+          src={user.profileImage?`https://learning-management-system-1zty.onrender.com${user.profileImage}`:`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3a7ce1&color=fff`}
           alt="Profile"
           className="w-16 h-16 rounded-full object-cover"
         />
@@ -634,7 +634,7 @@ const [user, setUser] = useState({
         description: complaintDescription,
       };
 
-      fetch("http://localhost:5000/api/complaints/complaints/add", {  // Corrected URL
+      fetch("https://learning-management-system-1zty.onrender.com/api/complaints/complaints/add", {  // Corrected URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(complaintData),

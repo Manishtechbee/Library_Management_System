@@ -12,7 +12,7 @@ export default function NoDuesRequest({ userId ,darkMode=false}) {
   });
 
   const handleRequest = () => {
-    fetch(`http://localhost:5000/api/nodues/request`, {
+    fetch(`https://learning-management-system-1zty.onrender.com/api/nodues/request`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

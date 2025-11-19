@@ -15,7 +15,7 @@ export default function UserManagement({ darkMode }) {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/user/data/");
+      const res = await fetch("https://learning-management-system-1zty.onrender.com/api/user/data/");
       const data = await res.json();
       setUsers(data);
     } catch (err) {
@@ -32,7 +32,7 @@ export default function UserManagement({ darkMode }) {
 
   const toggleStatus = async (userId, status) => {
     try {
-      await fetch(`http://localhost:5000/api/user/data/${userId}/status`, {
+      await fetch(`https://learning-management-system-1zty.onrender.com/api/user/data/${userId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -45,7 +45,7 @@ export default function UserManagement({ darkMode }) {
 
   const updateRole = async (userId, role) => {
     try {
-      await fetch(`http://localhost:5000/api/user/data/${userId}/role`, {
+      await fetch(`https://learning-management-system-1zty.onrender.com/api/user/data/${userId}/role`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role }),
@@ -60,7 +60,7 @@ export default function UserManagement({ darkMode }) {
     console.log(userId);
     if (true) {
       try {
-        await fetch(`http://localhost:5000/api/user/data/delete/${userId}`, {
+        await fetch(`https://learning-management-system-1zty.onrender.com/api/user/data/delete/${userId}`, {
           method: "delete",
           
         });
@@ -195,7 +195,7 @@ export default function UserManagement({ darkMode }) {
       <div className="flex items-center gap-4 mb-4">
         {selectedUser.profileImage ? (
           <img 
-            src={`http://localhost:5000${selectedUser.profileImage}`} 
+            src={`https://learning-management-system-1zty.onrender.com${selectedUser.profileImage}`} 
             alt="Profile" 
             className="w-16 h-16 rounded-full object-cover border" 
           />

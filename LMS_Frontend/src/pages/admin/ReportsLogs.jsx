@@ -22,7 +22,7 @@ export default function ReportsStatus({darkMode}) {
       return toast.error("Please select start and end date for custom report");
     }
 
-    const url = new URL("http://localhost:5000/api/admin/reports/download");
+    const url = new URL("https://learning-management-system-1zty.onrender.com/api/admin/reports/download");
     url.searchParams.append("type", reportType);
     url.searchParams.append("format", format);
 
@@ -42,7 +42,7 @@ export default function ReportsStatus({darkMode}) {
   }, []);
 
   const fetchStats = () => {
-    fetch("http://localhost:5000/api/admin/stats")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/stats")
       .then(res => res.json())
       .then(data => {
         setTotalBooks(data.totalBooks || 0);
@@ -54,14 +54,14 @@ export default function ReportsStatus({darkMode}) {
   };
 
   const fetchPopularBooks = () => {
-    fetch("http://localhost:5000/api/admin/popular-books")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/popular-books")
       .then(res => res.json())
       .then(data => setPopularBooks(data))
       .catch(() => toast.error("Failed to load popular books"));
   };
 
   const fetchRecentActivity = () => {
-    fetch("http://localhost:5000/api/admin/recent-activity")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/recent-activity")
     .then(res => res.json())
     .then(data => {
       if (Array.isArray(data)) {
@@ -79,14 +79,14 @@ export default function ReportsStatus({darkMode}) {
 
 
   const fetchWeeklyReports = () => {
-    fetch("http://localhost:5000/api/admin/weekly-reports")
+    fetch("https://learning-management-system-1zty.onrender.com/api/admin/weekly-reports")
       .then(res => res.json())
       .then(data => setWeeklyReports(data))
       .catch(() => toast.error("Failed to load weekly reports"));
   };
 
  const downloadReport = (format) => {
-  let url = `http://localhost:5000/api/admin/reports/download?type=${reportType}&format=${format}`;
+  let url = `https://learning-management-system-1zty.onrender.com/api/admin/reports/download?type=${reportType}&format=${format}`;
 
   if (reportType === "custom") {
     const startDate = prompt("Enter Start Date (YYYY-MM-DD):");
