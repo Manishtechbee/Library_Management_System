@@ -3,5 +3,5 @@ module.exports = {
   password: "123", // Change this
   dbName: "library",
   dbUser: "root",
-  dbPassword: "12345",
+  dbPassword: "TupUefyXKrMJQPVQxlHHkaYXHYsFJxRk",
 };
